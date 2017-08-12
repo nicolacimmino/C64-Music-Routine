@@ -29,9 +29,8 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-INSTRP=$02 ; 2 bytes
-STEPR=$04  ; still needed?
-MUWAIT=$06 ; 2 bytes?? amount of ticks for the current wait
+INSTRP=$02 ; 2 bytes pointer into the instrumet table commands
+MUWAIT=$04 ; 1 byte amount of ticks for the current wait
 TICK=$08   ; 2 bytes current TICK
 PHRP=$0A   ; 2 bytes pointer into the current PHRASE (abosulte address)
 
@@ -72,7 +71,7 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         
         CLI             ; LET INTERRUPTS COME.
 
-        ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PAYER RUNS ONLY ONCE PER
+        ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PLAYER RUNS ONLY ONCE PER
         ; FRAME WHEN THE INTERRUPT HAPPENS.
         
         JMP  *
@@ -80,20 +79,11 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
 ; *                                                                           *
 ; *****************************************************************************
 
-MUINIT  LDA #0          ; Start from step 0
-        STA STEPR
-        STA STEPR+1
-        
-        LDA #<PHRASE
+MUINIT  LDA #<PHRASE
         STA PHRP        ; Phrase pointer, will come from loop
         LDA #>PHRASE
         STA PHRP+1
 
-;        LDA  #<INSTR    ; Instrument 0 (this will really come from the track)
-;        STA  INSTRP
-;        LDA  #>INSTR
-;        STA  INSTRP+1
-;        
         LDX  #24        ; CLEAR ALL SID REGISTERS
         LDA  #0
         STA  $D400,X
@@ -129,11 +119,20 @@ ISR     INC TICK        ; NEXT TICK (16 BIT INCREMENT)
         LDA (PHRP),Y
         STA $D401
         
-        LDA  #<INSTR    ; Instrument 0 (this will really come from the phrase)
+        LDY #4          ; Instrument
+        LDA (PHRP),Y
+        ASL             ; Instrument*2
+        TAX
+        LDA  INSTTBL,X ; Instrument LSB
         STA  INSTRP
-        LDA  #>INSTR
+        INX
+        LDA  INSTTBL,X ; Instrument MSB
         STA  INSTRP+1
-       
+
+        LDY #5
+        LDA (PHRP),Y    ; Duration
+        STA MUWAIT
+        
         CLC
         LDA #6          ; On to next entry in the phrase
         ADC PHRP
@@ -214,19 +213,32 @@ WVR     TAX
 
 END     LDA  #0         ; We stay on the same instruction forever
         RTS
-               
-INSTR   BYTE $25, $11   ; WVR 5, $52            AD
-        BYTE $26, $F1   ; SR
-        BYTE $24, $11   ; WVR 4, %10000001      NOISE + GATE ON
-        BYTE $00, $01
-        BYTE $10
-        BYTE $24, $00   ;
+           
+INSTTBL WORD INSTR0
+        WORD INSTR1
 
+        ; This is is an example of an instrumet such, for instance, a flute or
+        ; a piano doing legato, where the length of the note is set in the phrase
+INSTR0  BYTE $25, $11   ; WVR 5, $52            AD
+        BYTE $26, $F1   ; SR
+        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
+        BYTE $10        ; WAI (note off)
+        BYTE $24, $00   ; WVR 4, 0              triangle + GATE OFF
+        BYTE $FF        ; END
+
+        ; This is an example of an instument such as a percussion
+        ; that has it's own duration regardless of what is set in the phrase
+INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
+        BYTE $26, $F1   ; SR
+        BYTE $24, $81   ; WVR 4, %10000001      NOISE + GATE ON
+        BYTE $00, $01   ; WIN 1                 Init wait to 1 tick
+        BYTE $10        ; WAI (duration set)
+        BYTE $24, $00   ; WVR 4, 0              NOISE + GATE OFF
         BYTE $FF        ; END
 
         ; ticklo tickhi  FRELO FREHI INSTR, DUR
 PHRASE  BYTE $01, $00, $D6, $1C, $00, $05
-        BYTE $41, $00, $D6, $2C, $00, $05
-        BYTE $81, $00, $D6, $1C, $00, $05
-        BYTE $F1, $00, $D6, $2C, $00, $05
+        BYTE $41, $00, $D6, $2C, $00, $20
+        BYTE $81, $00, $D6, $1C, $01, $20
+        BYTE $F1, $00, $D6, $2C, $01, $20
 

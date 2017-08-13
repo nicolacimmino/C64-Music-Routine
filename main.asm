@@ -29,10 +29,11 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-INSTRP=$02 ; 2 bytes pointer into the instrumet table commands
-MUWAIT=$04 ; 1 byte amount of ticks for the current wait
-TICK=$08   ; 2 bytes current TICK
-PHRP=$0A   ; 2 bytes pointer into the current PHRASE (abosulte address)
+MUWAIT=$02 ; 1 byte amount of ticks for the current wait
+TICK=$03   ; 2 bytes current TICK
+
+PHRASP=$10   ; 2 bytes pointer into the current PHRASE (abosulte address)
+INSTRP=$12 ; 2 bytes pointer into the instrumet table commands
 
 ; *****************************************************************************
 ; * THIS IS THE ENTRY POINT INTO OUR PROGRAM. WE DO SOME SETUP AND THEN LET   *
@@ -80,15 +81,26 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
 ; *****************************************************************************
 
 MUINIT  LDA #<PHRASE
-        STA PHRP        ; Phrase pointer, will come from loop
+        STA PHRASP        ; Phrase pointer, will come from loop
         LDA #>PHRASE
-        STA PHRP+1
+        STA PHRASP+1
 
         LDX  #24        ; CLEAR ALL SID REGISTERS
         LDA  #0
         STA  $D400,X
         DEX
         BNE  *-4
+
+        LDA  #0
+        STA  TICK
+        STA  TICK+1
+
+        LDX #0          ; Initialise to INSTRNO 
+        LDA  INSTTBL,X ; Instrument LSB
+        STA  INSTRP
+        INX
+        LDA  INSTTBL,X ; Instrument MSB
+        STA  INSTRP+1
 
         LDA #%00001111  ; Volume max
         STA $D418
@@ -103,24 +115,24 @@ ISR     INC TICK        ; NEXT TICK (16 BIT INCREMENT)
         BNE *+4
         INC TICK+1
 
-        LDY #0          ; PHRP IS POINTING TO THE CURRENT PHRASE ENTRY AND
+        LDY #0          ; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND
         LDA TICK        ; THE FIRST TWO BYTES ARE THE TICK OF THE NEXT EVENT
-        CMP (PHRP),Y    ; KEEP PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT
+        CMP (PHRASP),Y    ; KEEP PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT
         BNE @PLAY       ; REACHED THE TICK YET
         INY 
         LDA TICK+1
-        CMP (PHRP),Y
+        CMP (PHRASP),Y
         BNE @PLAY
 
         LDY #2          ; Freq LO from track
-        LDA (PHRP),Y
+        LDA (PHRASP),Y
         STA $D400
         LDY #3          ; Freq HI from track
-        LDA (PHRP),Y
+        LDA (PHRASP),Y
         STA $D401
         
         LDY #4          ; Instrument
-        LDA (PHRP),Y
+        LDA (PHRASP),Y
         ASL             ; Instrument*2
         TAX
         LDA  INSTTBL,X ; Instrument LSB
@@ -130,15 +142,15 @@ ISR     INC TICK        ; NEXT TICK (16 BIT INCREMENT)
         STA  INSTRP+1
 
         LDY #5
-        LDA (PHRP),Y    ; Duration
+        LDA (PHRASP),Y    ; Duration
         STA MUWAIT
         
         CLC
         LDA #6          ; On to next entry in the phrase
-        ADC PHRP
-        STA PHRP
+        ADC PHRASP
+        STA PHRASP
         BNE @PLAY
-        INC PHRP+1
+        INC PHRASP+1
 
 @PLAY   LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND
         LDA  (INSTRP),Y
@@ -214,12 +226,17 @@ WVR     TAX
 END     LDA  #0         ; We stay on the same instruction forever
         RTS
            
-INSTTBL WORD INSTR0
+INSTTBL WORD INSTRNO
         WORD INSTR1
+        WORD INSTR2
+
+        ; Null instrument, used for voices where an instrument has not be set 
+        ; yet.
+INSTRNO BYTE $FF        ; END
 
         ; This is is an example of an instrumet such, for instance, a flute or
         ; a piano doing legato, where the length of the note is set in the phrase
-INSTR0  BYTE $25, $11   ; WVR 5, $52            AD
+INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
         BYTE $26, $F1   ; SR
         BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
         BYTE $10        ; WAI (note off)
@@ -228,7 +245,7 @@ INSTR0  BYTE $25, $11   ; WVR 5, $52            AD
 
         ; This is an example of an instument such as a percussion
         ; that has it's own duration regardless of what is set in the phrase
-INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
+INSTR2  BYTE $25, $11   ; WVR 5, $52            AD
         BYTE $26, $F1   ; SR
         BYTE $24, $81   ; WVR 4, %10000001      NOISE + GATE ON
         BYTE $00, $01   ; WIN 1                 Init wait to 1 tick
@@ -237,8 +254,8 @@ INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
         BYTE $FF        ; END
 
         ; ticklo tickhi  FRELO FREHI INSTR, DUR
-PHRASE  BYTE $01, $00, $D6, $1C, $00, $05
-        BYTE $41, $00, $D6, $2C, $00, $20
-        BYTE $81, $00, $D6, $1C, $01, $20
-        BYTE $F1, $00, $D6, $2C, $01, $20
+PHRASE  BYTE $41, $00, $D6, $1C, $01, $05
+        BYTE $81, $00, $D6, $2C, $01, $20
+        BYTE $F1, $00, $D6, $1C, $02, $20
+        BYTE $41, $01, $D6, $2C, $02, $20
 

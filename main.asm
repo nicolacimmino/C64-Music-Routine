@@ -35,6 +35,10 @@ TICK=$03   ; 2 bytes current TICK
 PHRASP=$10   ; 2 bytes pointer into the current PHRASE (abosulte address)
 INSTRP=$12 ; 2 bytes pointer into the instrumet table commands
 
+
+incasm "imicrocode.asm"
+incasm "instruments.asm"
+
 ; *****************************************************************************
 ; * THIS IS THE ENTRY POINT INTO OUR PROGRAM. WE DO SOME SETUP AND THEN LET   *
 ; * THINGS ROLL FROM HERE.                                                    *
@@ -182,80 +186,4 @@ MUDONE  LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
 ; *                                                                           *
 ; *****************************************************************************
-
-*=$F000
-
-CMDTBL  WORD WIN
-        WORD WAI
-        WORD WVR
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD $0000
-        WORD END
-
-WIN     LDY  #1
-        LDA  (INSTRP),Y        
-        STA MUWAIT
-        LDA #2
-        RTS
-
-WAI     LDA #0
-        DEC MUWAIT
-        BNE @DONE
-        LDA #1
-@DONE   RTS
-
-WVR     TAX
-        LDY  #1
-        LDA  (INSTRP),Y
-        STA  $D400,X
-
-        LDA  #2         ; We consumed 2 bytes
-        RTS
-
-
-END     LDA  #0         ; We stay on the same instruction forever
-        RTS
-           
-INSTTBL WORD INSTRNO
-        WORD INSTR1
-        WORD INSTR2
-
-        ; Null instrument, used for voices where an instrument has not be set 
-        ; yet.
-INSTRNO BYTE $FF        ; END
-
-        ; This is is an example of an instrumet such, for instance, a flute or
-        ; a piano doing legato, where the length of the note is set in the phrase
-INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
-        BYTE $26, $F1   ; SR
-        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
-        BYTE $10        ; WAI (note off)
-        BYTE $24, $00   ; WVR 4, 0              triangle + GATE OFF
-        BYTE $FF        ; END
-
-        ; This is an example of an instument such as a percussion
-        ; that has it's own duration regardless of what is set in the phrase
-INSTR2  BYTE $25, $11   ; WVR 5, $52            AD
-        BYTE $26, $F1   ; SR
-        BYTE $24, $81   ; WVR 4, %10000001      NOISE + GATE ON
-        BYTE $00, $01   ; WIN 1                 Init wait to 1 tick
-        BYTE $10        ; WAI (duration set)
-        BYTE $24, $00   ; WVR 4, 0              NOISE + GATE OFF
-        BYTE $FF        ; END
-
-        ; ticklo tickhi  FRELO FREHI INSTR, DUR
-PHRASE  BYTE $41, $00, $D6, $1C, $01, $05
-        BYTE $81, $00, $D6, $2C, $01, $20
-        BYTE $F1, $00, $D6, $1C, $02, $20
-        BYTE $41, $01, $D6, $2C, $02, $20
 

@@ -2,7 +2,10 @@
 ; *                                                                           *
 ; * COPYRIGHT (C) 2017 NICOLA CIMMINO                                         *
 ; *                                                                           *
-; *   THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY    *
+; * THIS IS THE INSTRUMENTS MICROCODE IMPLEMENTATION. HERE WE DEFINE A SET OF *
+; * COMMANDS THAT ARE USED TO DEFINE THE INSTRUMENTS.                         *
+; *                                                                           *
+; *  THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY     *
 ; *   IT UNDER THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY    *
 ; *   THE FREE SOFTWARE FOUNDATION, EITHER VERSION 3 OF THE LICENSE, OR       *
 ; *   (AT YOUR OPTION) ANY LATER VERSION.                                     *
@@ -23,9 +26,10 @@
 ; *****************************************************************************
 ; *                                                                           *
 
-CMDTBL  WORD @WIN
-        WORD WAI
-        WORD WVR
+CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
+        WORD CMD_WAI           ; 0X10   WAINT
+        WORD CMD_WVR           ; 0X20   WRITE VOICE REGISTER
+        WORD CMD_WRI           ; 0X30   WRITE REGISTER
         WORD $0000
         WORD $0000
         WORD $0000
@@ -37,8 +41,7 @@ CMDTBL  WORD @WIN
         WORD $0000
         WORD $0000
         WORD $0000
-        WORD $0000
-        WORD END
+        WORD CMD_END           ; 0XFF
 
 ; *                                                                           *
 ; *****************************************************************************
@@ -48,7 +51,7 @@ CMDTBL  WORD @WIN
 ; * INITIALISES THE WAIT COUNTER. TAKES A ONE BYTE OPERAND WITH THE NUMBER OF *
 ; * OF TICKS TO WAIT.                                                         *
 
-@WIN    LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
+CMD_WIN LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
         LDA  (INSTRP),Y         ;
         STA  MUWAIT             ; 
         LDA  #2                 ; RETURN TOAL CONSUMED 2 BYTES.
@@ -59,11 +62,11 @@ CMDTBL  WORD @WIN
 
 ; *****************************************************************************
 ; * WAIT                                                                      *
-; * DESCREASES THE TICK COUNTER AND RETURNS 0 CONSUMED BYTES UNTIL THE WAIT   *
+; * DCREASES THE TICK COUNTER AND RETURNS 0 CONSUMED BYTES UNTIL THE WAIT     *
 ; * COUNTER REACHES ZERO. THIS CAUSES THE PLAYER TO RE-EXECUTE WAIT AT EVERY  *
 ; * TICK UNTIL WAIT EXPIRED.                                                  *
 
-WAI     LDA  #0                 ; ASSUME WE WILL RETURN ZERO.          
+CMD_WAI lDA  #0                 ; ASSUME WE WILL RETURN ZERO.          
         DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
         BNE  @DONE              ; NOT ZERO YET?
         LDA  #1                 ; WE REACHED ZERO, RETURN 1.
@@ -72,7 +75,26 @@ WAI     LDA  #0                 ; ASSUME WE WILL RETURN ZERO.
 ; *                                                                           *
 ; *****************************************************************************
 
-WVR     TAX
+; *****************************************************************************
+; * WRITE VOICE REGISTER/WRITE REGISTER.                                      *
+; *                                                                           *
+; * THE PLAYER PASSES US THE REGISTER NUMBER IN A (0-6), VOICE REIGSTER HAS   *
+; * THE CURRENT VOICE (1-3).                                                  *
+; *                                                                           *
+; * THIS FUNCTION HAS 2 ENTRY POINTS. WRI WRITES TO THE REGITER SPECIFIED IN  *
+; * THE LOWER NIBBLE + 0x10 WHILE WVR WRITES IN THAT REGISTER + (7*(VOICE-1)).*
+        
+CMD_WVR LDY  VOICE      
+        CLC
+@LOOP   DEY
+        BEQ  DOWR
+        ADC  #7
+        BNE  @LOOP 
+
+CMD_WRI CLC
+        ADC  #$10
+
+DOWR    TAX
         LDY  #1
         LDA  (INSTRP),Y
         STA  $D400,X
@@ -80,6 +102,14 @@ WVR     TAX
         LDA  #2         ; WE CONSUMED 2 BYTES
         RTS
 
+; *                                                                           *
+; *****************************************************************************
 
-END     LDA  #0         ; WE STAY ON THE SAME INSTRUCTION FOREVER
+; *****************************************************************************
+; * NO FURTHER ACTIONS FOR THIS INSTRUMENT.                                   *
+
+CMD_END LDA  #0         ; WE STAY ON THE SAME INSTRUCTION FOREVER
         RTS
+
+; *                                                                           *
+; *****************************************************************************

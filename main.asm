@@ -31,6 +31,7 @@
 
 MUWAIT=$02 ; 1 byte amount of ticks for the current wait
 TICK=$03   ; 2 bytes current TICK
+VOICE=$05  ; 1 byte, current voice being played
 
 PHRASP=$10   ; 2 bytes pointer into the current PHRASE (abosulte address)
 INSTRP=$12 ; 2 bytes pointer into the instrumet table commands
@@ -118,6 +119,9 @@ MUINIT  LDA #<PHRASE
 ISR     INC TICK        ; NEXT TICK (16 BIT INCREMENT)
         BNE *+4
         INC TICK+1
+
+        LDA #1          ; WE PLAY ONLY VOICE 1 FOR NOW, HERE WE WILL LOOP ALL 3
+        STA VOICE
 
         LDY #0          ; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND
         LDA TICK        ; THE FIRST TWO BYTES ARE THE TICK OF THE NEXT EVENT

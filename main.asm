@@ -29,16 +29,17 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-MUWAIT=$02 ; 1 byte amount of ticks for the current wait
+;;MUWAIT=$02 ; 1 byte amount of ticks for the current wait
 TICK=$03   ; 2 bytes current TICK
 VOICE=$05  ; 1 byte, current voice being played
 
+VTABLEOFF=$08 ; current voice voice table offset in bytes
+VOICETABLE=$10 ; VOICE TABLE BASE
 PHRASP=$10   ; 2 bytes pointer into the current PHRASE (abosulte address)
 INSTRP=$12 ; 2 bytes pointer into the instrumet table commands
-
-
-incasm "imicrocode.asm"
-incasm "instruments.asm"
+MUWAIT=$14 ; 2 bytes
+SPAREVREG=$16 ; 2 bytes
+; above set repeated per voice 1,2,3 (above is current)
 
 ; *****************************************************************************
 ; * THIS IS THE ENTRY POINT INTO OUR PROGRAM. WE DO SOME SETUP AND THEN LET   *
@@ -85,109 +86,16 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
 ; *                                                                           *
 ; *****************************************************************************
 
-MUINIT  LDA #<PHRASE
-        STA PHRASP        ; Phrase pointer, will come from loop
-        LDA #>PHRASE
-        STA PHRASP+1
-
-        LDX  #24        ; CLEAR ALL SID REGISTERS
-        LDA  #0
-        STA  $D400,X
-        DEX
-        BNE  *-4
-
-        LDA  #0
-        STA  TICK
-        STA  TICK+1
-
-        LDX #0          ; Initialise to INSTRNO 
-        LDA  INSTTBL,X ; Instrument LSB
-        STA  INSTRP
-        INX
-        LDA  INSTTBL,X ; Instrument MSB
-        STA  INSTRP+1
-
-        LDA #%00001111  ; Volume max
-        STA $D418
-        
-        RTS
- 
 ; *****************************************************************************
 ; * THIS IS THE RASTER INTERRUPT  SERVICE ROUTINE. IN A FULL APP THIS WOULD DO* 
-; * SEVERAL THINGS, WE HERE ONLY PROCESS THE MUSIC STUFF.                     *
+; * SEVERAL THINGS, WE HERE ONLY CALL THE MUSIC PLAYER.                       *
 
-ISR     INC TICK        ; NEXT TICK (16 BIT INCREMENT)
-        BNE *+4
-        INC TICK+1
-
-        LDA #1          ; WE PLAY ONLY VOICE 1 FOR NOW, HERE WE WILL LOOP ALL 3
-        STA VOICE
-
-        LDY #0          ; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND
-        LDA TICK        ; THE FIRST TWO BYTES ARE THE TICK OF THE NEXT EVENT
-        CMP (PHRASP),Y    ; KEEP PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT
-        BNE @PLAY       ; REACHED THE TICK YET
-        INY 
-        LDA TICK+1
-        CMP (PHRASP),Y
-        BNE @PLAY
-
-        LDY #2          ; Freq LO from track
-        LDA (PHRASP),Y
-        STA $D400
-        LDY #3          ; Freq HI from track
-        LDA (PHRASP),Y
-        STA $D401
-        
-        LDY #4          ; Instrument
-        LDA (PHRASP),Y
-        ASL             ; Instrument*2
-        TAX
-        LDA  INSTTBL,X ; Instrument LSB
-        STA  INSTRP
-        INX
-        LDA  INSTTBL,X ; Instrument MSB
-        STA  INSTRP+1
-
-        LDY #5
-        LDA (PHRASP),Y    ; Duration
-        STA MUWAIT
-        
-        CLC
-        LDA #6          ; On to next entry in the phrase
-        ADC PHRASP
-        STA PHRASP
-        BNE @PLAY
-        INC PHRASP+1
-
-@PLAY   LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND
-        LDA  (INSTRP),Y
-
-        ROR             ; GET HIGH NIBBLE*2 IN X
-        ROR             ;
-        ROR             ;
-        AND  #%00011110 ;
-        TAX             ;
-
-        LDA CMDTBL,X    ; TRANSFER MSB OF CMD ADDRESS
-        STA @JSRINS+1
-
-        LDA CMDTBL+1,X
-        STA @JSRINS+2
-
-        LDA  (INSTRP),Y ; PASS LOW NIBBLE OF COMMAND TO THE CALLED ROUTINE
-        AND  #%00001111
-
-@JSRINS JSR  *
-        
-        CLC             ; ROUTINE RETURNS IN A THE AMOUNT OF CMD MEMORY BYTES
-        ADC INSTRP      ; CONSUMED. MOVE INSTRP
-        STA INSTRP      ; TODO needs to be a 16bit addition
-
-MUDONE  LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
+ISR     JSR  MUPLAY
+        LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
         RTI
 
 ; *                                                                           *
 ; *****************************************************************************
 
+incasm "muplayer.asm"

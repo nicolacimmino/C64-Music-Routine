@@ -39,6 +39,7 @@
         <FileName>main.asm</FileName>
         <FileName>imicrocode.asm</FileName>
         <FileName>instruments.asm</FileName>
+        <FileName>muplayer.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>234</PaddingByte>
@@ -74,6 +75,17 @@
             <Breakpoints />
             <Bookmarks />
             <Topmost>True</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>muplayer.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
             <FileOpen>True</FileOpen>
         </SourceFile>
     </SourceFiles>

@@ -26,14 +26,14 @@ MUINIT  LDA #<PHRASE
         LDA #>PHRASE
         STA PHRASP+9
 
-        LDA #<PHRASE
+        LDA #<PHRASE2
         STA PHRASP+16        ; Phrase pointer, will come from loop
-        LDA #>PHRASE
+        LDA #>PHRASE2
         STA PHRASP+17
 
-        LDA #<PHRASE
+        LDA #<PHRASE3
         STA PHRASP+24       ; Phrase pointer, will come from loop
-        LDA #>PHRASE
+        LDA #>PHRASE3
         STA PHRASP+25
 
         LDX  #24        ; CLEAR ALL SID REGISTERS
@@ -96,12 +96,21 @@ NEXTV   ASL             ; A contains voice number
         CMP (PHRASP),Y
         BNE PLAY
  
+        LDA  #0
+        LDX  VOICE      
+        CLC
+@LOOP   DEX
+        BEQ  @DOWR
+        ADC  #7
+        BNE  @LOOP      ; BRANCH ALWAYS, ADC #7 NEVER SETS Z 
+
+@DOWR   TAX
         LDY #2          ; Freq LO from track
         LDA (PHRASP),Y
-        STA $D400
+        STA $D400,X
         LDY #3          ; Freq HI from track
         LDA (PHRASP),Y
-        STA $D401
+        STA $D401,X
         
         ; load instrument address to instrp
         LDY #4          ; Instrument

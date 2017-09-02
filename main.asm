@@ -29,17 +29,27 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-;;MUWAIT=$02 ; 1 byte amount of ticks for the current wait
-TICK=$03   ; 2 bytes current TICK
-VOICE=$05  ; 1 byte, current voice being played
+; *****************************************************************************
+; * PAGE ZERO MEMORY MAP                                                      *
 
-VTABLEOFF=$08 ; current voice voice table offset in bytes
-VOICETABLE=$10 ; VOICE TABLE BASE
-PHRASP=$10   ; 2 bytes pointer into the current PHRASE (abosulte address)
-INSTRP=$12 ; 2 bytes pointer into the instrumet table commands
-MUWAIT=$14 ; 2 bytes
-SPAREVREG=$16 ; 2 bytes
-; above set repeated per voice 1,2,3 (above is current)
+TICK    =$03            ; 2 BYTES, CURRENT TICK.
+VOICE   =$05            ; 1 BYTE, CURRENT VOICE (1-3).
+VTOFF   =$06            ; 1 BYTES, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
+
+        ; VOICE  TABLE  CONTAINS  4  SETS  OF  REGISTERS THAT KEEP TRACK OF THE 
+        ; CURRENT STATUS OF THE PHRASE AND  INSTRUMENT FOR EACH VOICE, EACH SET
+        ; IS 8 BYTES LONG. THE FIRST SET  REPRESENTS THE VOICE CURRENTLY PLAYNG
+        ; THE FOLLOWING 3 SETS ARE THE COPIES REPRESENTING  THE LAST STATUS FOR
+        ; FOR VOICES 1-3.
+
+VTBL    =$10            ; 32 BYTES, VOICE TABLE.
+PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
+INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
+MUWAIT  =$14            ; 2 BYTES, TICKS LEFT FOR WAIT COMMAIN.
+
+        ; VOICE TABLE ENDS AT $2F.
+; *                                                                           *
+; *****************************************************************************
 
 ; *****************************************************************************
 ; * THIS IS THE ENTRY POINT INTO OUR PROGRAM. WE DO SOME SETUP AND THEN LET   *
@@ -99,3 +109,5 @@ ISR     JSR  MUPLAY
 ; *****************************************************************************
 
 incasm "muplayer.asm"
+incasm "imicrocode.asm"
+incasm "instruments.asm"

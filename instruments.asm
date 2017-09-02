@@ -1,4 +1,6 @@
 
+align 256
+
 INSTTBL WORD INSTRNO
         WORD INSTR1
         WORD INSTR2
@@ -12,7 +14,7 @@ INSTRNO BYTE $FF        ; END
         ; a piano where the length of the note is set in the phrase
 INSTR1  BYTE $25, $11   ; WVR 5, $52            AD
         BYTE $26, $F1   ; SR
-        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
+        BYTE $24, $21   ; WVR 4, %10000001      triangle + GATE ON
         BYTE $10        ; WAI (note off)
         BYTE $24, $00   ; WVR 4, 0              triangle + GATE OFF
         BYTE $FF        ; END
@@ -35,17 +37,60 @@ PIANO   BYTE $25, $4F   ; WVR 5, $FF            AD
         BYTE $FF        ; END
 
         ; ticklo tickhi  FRELO FREHI INSTR, DUR
-PHRASE  BYTE $41, $00, $D6, $1C, $03, $05
-        BYTE $81, $00, $D6, $2C, $02, $20
-        BYTE $F1, $00, $D6, $1C, $03, $30
-        BYTE $41, $01, $D6, $2C, $02, $40
 
-PHRASE2 BYTE $44, $00, $D6, $1C, $03, $05
-        BYTE $84, $00, $D6, $2C, $02, $20
-        BYTE $F4, $00, $D6, $1C, $03, $30
-        BYTE $44, $01, $D6, $2C, $02, $40
+align 256
 
-PHRASE3 BYTE $48, $00, $D6, $1C, $03, $05
-        BYTE $88, $00, $D6, $2C, $02, $20
-        BYTE $F8, $00, $D6, $1C, $03, $30
-        BYTE $48, $01, $D6, $2C, $02, $40
+PHRASE  BYTE $41, $00, $D6, $1C, $02, $00
+        BYTE $51, $00, $D6, $2C, $02, $00
+        BYTE $61, $00, $D6, $1C, $02, $00
+        BYTE $71, $00, $D6, $2C, $02, $00
+        BYTE $81, $00, $D6, $1C, $02, $00
+        BYTE $91, $00, $D6, $2C, $02, $00
+        BYTE $A1, $00, $D6, $1C, $02, $00
+        BYTE $B1, $00, $D6, $2C, $02, $00
+        BYTE $C1, $00, $D6, $1C, $02, $00
+        BYTE $D1, $00, $D6, $2C, $02, $00
+        BYTE $E1, $00, $D6, $1C, $02, $00
+        BYTE $F1, $00, $D6, $2C, $02, $00
+        BYTE $01, $01, $D6, $1C, $02, $00
+        BYTE $11, $01, $D6, $2C, $02, $00
+        BYTE $21, $01, $D6, $1C, $02, $00
+        BYTE $31, $01, $D6, $2C, $02, $00
+
+align 256
+
+PHRASE2 BYTE $41, $0F, $D6, $1C, $03, $05
+        BYTE $51, $00, $D6, $2C, $03, $02
+        BYTE $61, $00, $D6, $1C, $03, $05
+        BYTE $71, $00, $D6, $2C, $03, $02
+        BYTE $81, $00, $D6, $1C, $03, $05
+        BYTE $91, $00, $D6, $2C, $03, $02
+        BYTE $A1, $00, $D6, $1C, $03, $05
+        BYTE $B1, $00, $D6, $2C, $03, $02
+        BYTE $C1, $00, $D6, $1C, $03, $05
+        BYTE $D1, $00, $D6, $2C, $03, $02
+        BYTE $E1, $00, $D6, $1C, $03, $05
+        BYTE $F1, $00, $D6, $2C, $03, $02
+        BYTE $01, $01, $D6, $1C, $03, $05
+        BYTE $11, $01, $D6, $2C, $03, $02
+        BYTE $21, $01, $D6, $1C, $03, $05
+        BYTE $31, $01, $D6, $2C, $03, $02
+
+align 256
+
+PHRASE3 BYTE $41, $0F, $D6, $1C, $01, $05
+        BYTE $51, $00, $D6, $2C, $01, $02
+        BYTE $61, $00, $D6, $1C, $01, $05
+        BYTE $71, $00, $D6, $2C, $01, $02
+        BYTE $81, $00, $D6, $1C, $01, $05
+        BYTE $91, $00, $D6, $2C, $01, $02
+        BYTE $A1, $00, $D6, $1C, $01, $05
+        BYTE $B1, $00, $D6, $2C, $01, $02
+        BYTE $C1, $00, $D6, $1C, $01, $05
+        BYTE $D1, $00, $D6, $2C, $01, $02
+        BYTE $E1, $00, $D6, $1C, $01, $05
+        BYTE $F1, $00, $D6, $2C, $01, $02
+        BYTE $01, $01, $D6, $1C, $01, $05
+        BYTE $11, $01, $D6, $2C, $01, $02
+        BYTE $21, $01, $D6, $1C, $01, $05
+        BYTE $31, $01, $D6, $2C, $01, $02

@@ -18,9 +18,6 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-incasm "imicrocode.asm"
-incasm "instruments.asm"
-
 MUINIT  LDA #<PHRASE
         STA PHRASP+8        ; Phrase pointer, will come from loop
         LDA #>PHRASE
@@ -76,13 +73,13 @@ MUPLAY  INC TICK        ; NEXT TICK (16 BIT INCREMENT)
 NEXTV   ASL             ; A contains voice number
         ASL
         ASL
-        STA VTABLEOFF
+        STA VTOFF
         TAX
 
         ; copy voice vtable to current vtable
         LDY #7
-@COPY   LDA VOICETABLE+7,X
-        STA VOICETABLE,Y
+@COPY   LDA VTBL+7,X
+        STA VTBL,Y
         DEX
         DEY
         BPL @COPY
@@ -163,10 +160,10 @@ PLAY   LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND
 @DONEADD
 
         ; copy current voice vtable to voice table
-        LDX VTABLEOFF
+        LDX VTOFF
         LDY #7
-@COPY   LDA VOICETABLE,Y
-        STA VOICETABLE+7,X
+@COPY   LDA VTBL,Y
+        STA VTBL+7,X
         DEX
         DEY
         BPL @COPY

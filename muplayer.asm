@@ -124,7 +124,7 @@ NEXTV   ASL             ; A contains voice number
         STA MUWAIT
         
         CLC
-        LDA #6          ; On to next entry in the phrase
+        LDA #8          ; On to next entry in the phrase
         ADC PHRASP
         STA PHRASP
         BNE PLAY

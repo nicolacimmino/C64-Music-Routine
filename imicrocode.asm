@@ -64,7 +64,7 @@ CMD_WIN LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
 ; * COUNTER REACHES ZERO. THIS CAUSES THE PLAYER TO RE-EXECUTE WAIT AT EVERY  *
 ; * TICK UNTIL WAIT EXPIRED.                                                  *
 
-CMD_WAI lDA  #0                 ; ASSUME WE WILL RETURN ZERO.          
+CMD_WAI LDA  #0                 ; ASSUME WE WILL RETURN ZERO.          
         DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
         BNE  @DONE              ; NOT ZERO YET?
         LDA  #1                 ; WE REACHED ZERO, RETURN 1.

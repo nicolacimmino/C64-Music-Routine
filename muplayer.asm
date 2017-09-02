@@ -46,13 +46,13 @@ MUINIT  LDA #<PHRASE
         STA  TICK
         STA  TICK+1
 
-        LDX #0          ; Initialise to INSTRNO 
-        LDA  INSTTBL,X ; Instrument LSB
+        ;;LDX #0          ; Initialise to INSTRNO 
+        LDA  INSTTBL ; Instrument LSB
         STA  INSTRP+8
         STA  INSTRP+16
         STA  INSTRP+24
-        INX
-        LDA  INSTTBL,X ; Instrument MSB
+       
+        LDA  INSTTBL+1 ; Instrument MSB
         STA  INSTRP+9
         STA  INSTRP+17
         STA  INSTRP+25
@@ -86,14 +86,16 @@ NEXTV   ASL             ; A contains voice number
         DEX
         DEY
         BPL @COPY
-                        ; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND
+        
+        LDY #0; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND
         LDA TICK        ; THE FIRST TWO BYTES ARE THE TICK OF THE NEXT EVENT
-        CMP (PHRASP,X)  ; KEEP PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT
+        CMP (PHRASP),Y ; KEEP PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT
         BNE PLAY       ; REACHED THE TICK YET
+        INY
         LDA TICK+1
-        CMP (PHRASP+1,X)
+        CMP (PHRASP),Y
         BNE PLAY
-
+ 
         LDY #2          ; Freq LO from track
         LDA (PHRASP),Y
         STA $D400
@@ -115,14 +117,12 @@ NEXTV   ASL             ; A contains voice number
         LDA (PHRASP),Y    ; Duration
         STA MUWAIT
         
-        LDX VOICE
-        ASL
         CLC
         LDA #6          ; On to next entry in the phrase
-        ADC PHRASP,X
-        STA PHRASP,X
+        ADC PHRASP
+        STA PHRASP
         BNE PLAY
-        INC PHRASP+1,X
+        INC PHRASP+1
 
 PLAY   LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND
         LDA  (INSTRP),Y
@@ -153,7 +153,7 @@ PLAY   LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND
         STA INSTRP
 @DONEADD
 
-        ; copy current voice vtable to voice table (mirrored)
+        ; copy current voice vtable to voice table
         LDX VTABLEOFF
         LDY #7
 @COPY   LDA VOICETABLE,Y

@@ -164,7 +164,7 @@ PLAY    LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         BPL  @COPY      ;
 
         DEC  VOICE      ; NEXT VOICE OR LEAVE IF WE HAVE GONE THROUGH THEM ALL.
-        BEQ  *+4        ;
+        BEQ  *+5        ;
         JMP  NEXTV      ;
 
         RTS

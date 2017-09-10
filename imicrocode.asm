@@ -25,8 +25,7 @@
 ; *                                                                           *
 
 CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
-        WORD CMD_WAI           ; 0X10   WAINT
-        WORD CMD_WVR           ; 0X20   WRITE VOICE REGISTER
+        WORD CMD_WAI           ; 0X10   WAIT
         WORD CMD_WRI           ; 0X30   WRITE REGISTER
         WORD $0000
         WORD $0000
@@ -39,7 +38,8 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
         WORD $0000
         WORD $0000
         WORD $0000
-        WORD CMD_END           ; 0XFF
+        WORD $0000
+        WORD CMD_END           ; 0XF0
 
 ; *                                                                           *
 ; *****************************************************************************
@@ -74,23 +74,25 @@ CMD_WAI LDA  #$80               ; ASSUME WE WILL RETURN ZERO, Y BIT SET.
 ; *****************************************************************************
 
 ; *****************************************************************************
-; * WRITE VOICE REGISTER/WRITE REGISTER.                                      *
+; * WRITE REGISTER.                                                           *
 ; *                                                                           *
-; * THE PLAYER PASSES US THE REGISTER NUMBER IN A (0-6), VOICE REIGSTER HAS   *
-; * THE CURRENT VOICE (1-3).                                                  *
-; *                                                                           *
-; * THIS FUNCTION HAS 2 ENTRY POINTS. WRI WRITES TO THE REGITER SPECIFIED IN  *
-; * THE LOWER NIBBLE + 0x10 WHILE WVR WRITES IN THAT REGISTER + (7*(VOICE-1)).*
+; * THE PLAYER PASSES US THE REGISTER NUMBER IN A (0-15), VOICE REIGSTER HAS  *
+; * THE CURRENT VOICE (1-3). THESE ARE VIRTUALISED REGISTER NUMBERS AND HERE  *
+; * WE CONVERT THOSE TO THE ACTUALY PHYSICAL SID REGISTER NUMBER.             *
+
+CMD_WRI CMP  #$07       ; TEST REG NUMBER, IF <7 THIS IS A VOICE REGISTER, GO TO
+        BMI  @VOICER    ; RELEVANT VOICE REGISTER SET.
         
-CMD_WVR LDY  VOICE      
+        CLC             ; THIS IS A GLOBAL REGISTER, OFFSET BY 13 AS THE FIRST
+        ADC  #13        ; VIRTUALISED GLOBAL IS 8 AND REAL IS 21.
+        BNE  DOWR       ; BRANCH ALWAYS AS ADC #13 NEVER SETS Z.
+
+@VOICER LDY  VOICE      
         CLC
 @LOOP   DEY
         BEQ  DOWR
         ADC  #7
         BNE  @LOOP      ; BRANCH ALWAYS, ADC #7 NEVER SETS Z 
-
-CMD_WRI CLC
-        ADC  #$10
 
 DOWR    TAX
         LDY  #1

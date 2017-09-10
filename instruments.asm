@@ -43,13 +43,13 @@ PIANO   BYTE $25, $4F   ; WVR 5, $FF            AD
         ; FREQUENCY AROUND 600HZ, SID WHITE NOISE IS ACTUALLY COLOURED SO 
         ; THIS MATTERS.
 
-SHOT    BYTE $25, $00   ; WVR 5, $00            ATTACK 0MS, DECAY 0MS
-        BYTE $26, $F9   ; WVR 6, $F9            SUSTAIN 16, RELEASE 750MS
-        BYTE $21, $28   ; WVR 1, $28            FREQUENCY HI
-        BYTE $20, $C8   ; WVR 0, $C8            FREQUENCY LO (622HZ)
-        BYTE $24, $81   ; WVR 4, %10000001      WF NOISE, GATE ON        
+SHOT    BYTE $25, $00   ; WRI 5, $00            ATTACK 0MS, DECAY 0MS
+        BYTE $26, $F9   ; WRI 6, $F9            SUSTAIN 16, RELEASE 750MS
+        BYTE $21, $28   ; WRI 1, $28            FREQUENCY HI
+        BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
+        BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
         BYTE $00, $02   ; WIN 2                 INIT WAIT, 2 TICKS
         BYTE $10        ; WAI                   WAIT
-        BYTE $24, $80   ; WVR 4, %10000000      NOISE, GATE OFF        
+        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END
 

@@ -26,7 +26,7 @@ INSTR1  BYTE $25, $03   ; WVR 5, $52            AD
 INSTR2  BYTE $25, $11   ; WVR 5, $52            AD
         BYTE $26, $F1   ; SR
         BYTE $24, $81   ; WVR 4, %10000001      NOISE + GATE ON
-        BYTE $00, $01   ; WIN 1                 Init wait to 1 tick
+        BYTE $01        ; WIN 1                 Init wait to 1 tick
         BYTE $10        ; WAI (duration set)
         BYTE $24, $00   ; WVR 4, 0              NOISE + GATE OFF
         BYTE $FF        ; END
@@ -43,12 +43,12 @@ PIANO   BYTE $25, $4F   ; WVR 5, $FF            AD
         ; FREQUENCY AROUND 600HZ, SID WHITE NOISE IS ACTUALLY COLOURED SO 
         ; THIS MATTERS.
 
-SHOT    BYTE $25, $00   ; WRI 5, $00            ATTACK 0MS, DECAY 0MS
-        BYTE $26, $F9   ; WRI 6, $F9            SUSTAIN 16, RELEASE 750MS
+SHOT    BYTE $25, $02   ; WRI 5, $02            ATTACK 0MS, DECAY 16MS
+        BYTE $26, $A9   ; WRI 6, $A9            SUSTAIN 10, RELEASE 750MS
         BYTE $21, $28   ; WRI 1, $28            FREQUENCY HI
         BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
         BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
-        BYTE $00, $02   ; WIN 2                 INIT WAIT, 2 TICKS
+        BYTE $02        ; WIN 2                 INIT WAIT, 4 TICKS
         BYTE $10        ; WAI                   WAIT
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END

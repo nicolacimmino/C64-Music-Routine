@@ -46,13 +46,12 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
 
 ; *****************************************************************************
 ; * WAIT INIT                                                                 *
-; * INITIALISES THE WAIT COUNTER. TAKES A ONE BYTE OPERAND WITH THE NUMBER OF *
-; * OF TICKS TO WAIT.                                                         *
+; * INITIALISES THE WAIT COUNTER. TAKES THE NUMBER OF TICKS in P0.            *
 
-CMD_WIN LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
-        LDA  (INSTRP),Y         ;
+CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
+        ASL
         STA  MUWAIT             ; 
-        LDA  #$02               ; RETURN TOAL CONSUMED 2 BYTES, Y BIT CLEAR.
+        LDA  #$01               ; RETURN TOAL CONSUMED 1 BYTE, Y BIT CLEAR.
         RTS
 
 ; *                                                                           *

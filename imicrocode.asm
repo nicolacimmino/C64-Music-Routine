@@ -52,7 +52,7 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
 CMD_WIN LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
         LDA  (INSTRP),Y         ;
         STA  MUWAIT             ; 
-        LDA  #2                 ; RETURN TOAL CONSUMED 2 BYTES.
+        LDA  #$02               ; RETURN TOAL CONSUMED 2 BYTES, Y BIT CLEAR.
         RTS
 
 ; *                                                                           *
@@ -64,10 +64,10 @@ CMD_WIN LDY  #1                 ; INIT THE WAIT COUNTER WITH THE OPERAND.
 ; * COUNTER REACHES ZERO. THIS CAUSES THE PLAYER TO RE-EXECUTE WAIT AT EVERY  *
 ; * TICK UNTIL WAIT EXPIRED.                                                  *
 
-CMD_WAI LDA  #0                 ; ASSUME WE WILL RETURN ZERO.          
+CMD_WAI LDA  #$80               ; ASSUME WE WILL RETURN ZERO, Y BIT SET.          
         DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
         BNE  @DONE              ; NOT ZERO YET?
-        LDA  #1                 ; WE REACHED ZERO, RETURN 1.
+        LDA  #$81               ; WE REACHED ZERO, RETURN 1, Y BIT SET.
 @DONE   RTS
 
 ; *                                                                           *
@@ -97,16 +97,16 @@ DOWR    TAX
         LDA  (INSTRP),Y
         STA  $D400,X
 
-        LDA  #2         ; WE CONSUMED 2 BYTES
+        LDA  #$02       ; WE CONSUMED 2 BYTES, Y BIT CLEAR.
         RTS
 
 ; *                                                                           *
 ; *****************************************************************************
 
 ; *****************************************************************************
-; * NO FURTHER ACTIONS FOR THIS INSTRUMENT.                                   *
+; * NO FURTHER ACTIONS FOR THIS INSTRUMENT. WE STAY ON THE SAME INSTRUCTION.  *
 
-CMD_END LDA  #0         ; WE STAY ON THE SAME INSTRUCTION FOREVER
+CMD_END LDA  #$80       ; WE CONSUMED 0 BYTES, Y BIT SET.
         RTS
 
 ; *                                                                           *

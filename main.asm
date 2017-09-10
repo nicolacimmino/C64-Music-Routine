@@ -100,7 +100,14 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
 ; * THIS IS THE RASTER INTERRUPT  SERVICE ROUTINE. IN A FULL APP THIS WOULD DO* 
 ; * SEVERAL THINGS, WE HERE ONLY CALL THE MUSIC PLAYER.                       *
 
-ISR     JSR  MUPLAY
+ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
+        STA  $D020      ; PLAYER TAKES.
+
+        JSR  MUPLAY
+
+        LDA  #0         ; BORDER BACK TO BLACK.
+        STA  $D020
+
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
         RTI
@@ -111,3 +118,4 @@ ISR     JSR  MUPLAY
 incasm "muplayer.asm"
 incasm "imicrocode.asm"
 incasm "instruments.asm"
+incasm "track.asm"

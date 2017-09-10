@@ -42,7 +42,7 @@ Each instruction is encoded in the high nibble of the command value. The lower n
 
 ### WIN - Wait Init ###
 
-Initialises the wait counter to the desired amount of ticks a following wait instruction will have to wait. The amount of ticks to wait is encoded in the lower nibble of the command byte as the amount of ticks/2, this allows waits ranging from 33mS to to 528mS in steps of 33mS. Note that while MUWAIT is an 8 bit register, so can be set for a delay up to 256 ticks (roughly 4 seconds), the WIN instruction allows to set it only up to 32 because of the limited size of P1. This was considered enough for intra-instruction durations, longer durations can be set for the whole note in the track note length byte.
+Initialises the wait counter to the desired amount of ticks a following wait instruction will have to wait. The amount of ticks to wait is encoded in the lower nibble of the command byte as the amount of ticks/2, this allows waits ranging from 33mS to to 528mS in steps of 33mS. Note that while MUWAIT is an 8 bit register, so can be set for a delay up to 256 ticks (roughly 4 seconds), the WIN instruction allows to set it only up to 32 because of the limited size of P0. This was considered enough for intra-instruction durations, longer durations can be set for the whole note in the track note length byte.
 
 ```
 LENGTH:1        STATUS Y---
@@ -96,7 +96,7 @@ The gunshot effect is obtained by gating quickly on and off some white noise wit
         BYTE $21, $28   ; WRI 1, $28            FREQUENCY HI
         BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
         BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
-        BYTE $04        ; WIN 4                 INIT WAIT, 4 TICKS
+        BYTE $02        ; WIN 2                 INIT WAIT, 4 TICKS
         BYTE $10        ; WAI                   WAIT
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END

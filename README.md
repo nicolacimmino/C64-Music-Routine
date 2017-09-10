@@ -23,7 +23,7 @@ IMC operates on a virtualised SID that exposes the SID 29 registers in two a set
 | 12 | R | Potentiometer X |
 | 13 | R | Potentiometer Y |
 | 14 | R | Oscillator 3 sample |
-| 15 | R | Envelop 3 sample |
+| 15 | R | Envelope 3 sample |
 
 
 

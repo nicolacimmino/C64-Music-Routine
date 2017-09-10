@@ -91,8 +91,8 @@ AFFECTS:
 The gunshot effect is obtained by gating quickly on and off some white noise with an envelope decaying slowly. This gives the initial bang followed by a tail of fading noise. We set the voice frequency to 622Hz, noise in the SID is colored, so setting a frequency actually has an effect.
 
 ```
-        BYTE $25, $02   ; WRI 5, $00            ATTACK 0MS, DECAY 0MS
-        BYTE $26, $A9   ; WRI 6, $F9            SUSTAIN 16, RELEASE 750MS
+        BYTE $25, $02   ; WRI 5, $02            ATTACK 0MS, DECAY 16MS
+        BYTE $26, $A9   ; WRI 6, $A9            SUSTAIN 10, RELEASE 750MS
         BYTE $21, $28   ; WRI 1, $28            FREQUENCY HI
         BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
         BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
@@ -100,4 +100,5 @@ The gunshot effect is obtained by gating quickly on and off some white noise wit
         BYTE $10        ; WAI                   WAIT
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END
+
 ```

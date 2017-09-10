@@ -40,7 +40,7 @@ Each instruction is encoded in the high nibble of the command value. The lower n
 | CMD | P0 |    P1    |
 ```
 
-### WIN - Wait INit ###
+### WIN - Wait Init ###
 
 Initialises the wait counter to the desired amount of ticks a following wait instruction will have to wait. The amount of ticks to wait is encoded in the lower nibble of the command byte as the amount of ticks/2, this allows waits ranging from 33mS to to 528mS in steps of 33mS.
 
@@ -51,7 +51,7 @@ AFFECTS:
 P0 => MUWAIT 
 ```
 
-### WAI - WAIt ###
+### WAI - Wait ###
 
 Waits the amount of ticks in MUWAIT. This is not an idle wait, the command will set the Y flag so it will cause the virtualised SID to yield and so the other voices will be executed as well. The command will let the flow progress to the next instruction only once MUWAIT reaches zero.
 
@@ -62,6 +62,27 @@ AFFECTS:
 MUWAIT - 1 => MUWAIT 
 ```
 
+### WRI - Write Register ###
+
+Writes a value into the specified register. This command takes the virtualised SID register in P0 and the value to write in P1. See "Virtualised SID registers" section above for the actual registers map. 
+
+```
+LENGTH:2        STATUS Y---
+                       0---
+AFFECTS:       
+P1 => REG[P0] 
+```
+
+### END - End sequence ###
+
+Ends an instrument commands sequence an yealds. No more code for this instrument will be executed until a new note on it is played.
+
+```
+LENGTH:1        STATUS Y---
+                       0---
+AFFECTS:       
+---
+```
 
 # Units #
 

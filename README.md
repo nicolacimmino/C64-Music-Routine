@@ -4,7 +4,7 @@ Instruments are defined by making use of a microcode that executes intructions o
 
 ## The virtualised SID ##
 
-IMC operates on a virtualised SID that exposes the SID 29 registers in two a set of 7 voice registers and 8 global registers respectively. The 7 voice registers, as opposed to the 7 registers per voice of the SID, allow to write instruments in IMC that can be played on any voice. The global 8 registers are the voice independent registers as found in the SID. Below is the registers map as seen by IMC intructions.
+IMC operates on a virtualised SID that exposes the SID 29 registers in just 16 registers: 7 voice registers and 8 global registers (there's an unused register between the two blocks to align things nicely). The 7 voice registers, as opposed to the 7 registers per voice of the SID, allow to write instruments in IMC that can be played on any voice. The global 8 registers are the voice independent registers as found in the SID. Below is the registers map as seen by IMC intructions.
 
 | REG | Direction | Purpose |
 |---|---|---|

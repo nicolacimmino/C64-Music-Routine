@@ -1,3 +1,6 @@
+
+[Instruments](#instruments)
+
 # Instruments #
 
 Instruments are defined by making use of a microcode that executes intructions on a virtualised SID. These instructions allow to create intruments that are more complex than it would be possible by just defyning a waveform and an ADSR envelope. Microcoded instruments can evolve all the sound parameters over time, giving access to a more rich sound palette. We will refer to the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
@@ -18,12 +21,12 @@ IMC operates on a virtualised SID that exposes the SID 29 registers in just 16 r
 | 7 | W | Not in use |
 | 8 | W | Filter Cutoff Low |
 | 9 | W | Filter Cutoff Hi |
-| 10 | W | Filter Resonance and voice selectors |
-| 11 | W | Mode and volume |
+| 10 | W | Filter Resonance and Voice Selectors |
+| 11 | W | Mode and Volume |
 | 12 | R | Potentiometer X |
 | 13 | R | Potentiometer Y |
-| 14 | R | Oscillator 3 sample |
-| 15 | R | Envelope 3 sample |
+| 14 | R | Oscillator 3 Sample |
+| 15 | R | Envelope 3 Sample |
 
 
 

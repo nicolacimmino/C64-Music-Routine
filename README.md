@@ -51,15 +51,17 @@ AFFECTS:
 P0 => MUWAIT 
 ```
 
-### WAI - Wait ###
+### LWW - Loop While Waiting ###
 
-Waits the amount of ticks in MUWAIT. This is not an idle wait, the command will set the Y flag so it will cause the virtualised SID to yield and the other voices will be executed as well. The command will let the flow progress to the next instruction only once MUWAIT reaches zero.
+Waits the amount of ticks in MUWAIT. This is not an idle wait, the command will set the Y flag so it will cause the virtualised SID to yield and the other voices will be executed as well. Additionally INSTRP will be decremented by P0 unless MUWAIT has reached zero in which case the command will let the flow progress to the next instruction.
 
 ```
 LENGTH:1        STATUS Y---
                        1---
 AFFECTS:       
-MUWAIT - 1 => MUWAIT 
+MUWAIT - 1  => MUWAIT
+INSTRP - P0 => INSTRP IF MUWAIT>0
+INSTRP + 1  => INSTRP IF MUWAIT=0
 ```
 
 ### WRI - Write Register ###

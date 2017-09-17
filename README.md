@@ -75,7 +75,7 @@ P1 => REG[P0]
 
 ### END - End sequence ###
 
-Ends an instrument commands sequence and yealds. No more code for this instrument will be executed until a new note on it is played.
+Ends an instrument commands sequence and yield. No more code for this instrument will be executed until a new note on it is played.
 
 ```
 LENGTH:1        STATUS Y---

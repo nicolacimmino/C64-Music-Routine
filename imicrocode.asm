@@ -25,8 +25,8 @@
 ; *                                                                           *
 
 CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
-        WORD CMD_WAI           ; 0X10   WAIT
-        WORD CMD_WRI           ; 0X30   WRITE REGISTER
+        WORD CMD_LWW           ; 0X10   LOOP WHILE WAITING
+        WORD CMD_WRI           ; 0X20   WRITE REGISTER
         WORD $0000
         WORD $0000
         WORD $0000
@@ -38,7 +38,7 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
         WORD $0000
         WORD $0000
         WORD $0000
-        WORD $0000
+        WORD CMD_YLD           ; 0XE0
         WORD CMD_END           ; 0XF0
 
 ; *                                                                           *
@@ -58,16 +58,23 @@ CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
 ; *****************************************************************************
 
 ; *****************************************************************************
-; * WAIT                                                                      *
-; * DCREASES THE TICK COUNTER AND RETURNS 0 CONSUMED BYTES UNTIL THE WAIT     *
-; * COUNTER REACHES ZERO. THIS CAUSES THE PLAYER TO RE-EXECUTE WAIT AT EVERY  *
-; * TICK UNTIL WAIT EXPIRED.                                                  *
+; * LOOP WHILE WAITING.                                                       *
+; * LOOP P0 INSTRUCYIONS BACK UNLESS WAIT END. YIELDS AFTER EACH LOOP.        *
 
-CMD_WAI LDA  #$80               ; ASSUME WE WILL RETURN ZERO, Y BIT SET.          
-        DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
-        BNE  @DONE              ; NOT ZERO YET?
-        LDA  #$81               ; WE REACHED ZERO, RETURN 1, Y BIT SET.
-@DONE   RTS
+CMD_LWW DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
+        BNE  @LOOP              ; NOT ZERO YET?
+        LDA  #$81               ; WE REACHED ZERO, RETURN 1, Y BIT SET.        
+        RTS
+@LOOP   CLC             
+        EOR  #$FF        
+        ADC  #1
+        CLC
+        ADC  INSTRP
+        STA  INSTRP
+        BPL  @DONE
+        DEC  INSTRP+1
+@DONE   LDA  #$80               ; ASSUME WE WILL RETURN ZERO, Y BIT SET.                  
+        RTS
 
 ; *                                                                           *
 ; *****************************************************************************
@@ -105,6 +112,16 @@ DOWR    TAX
 ; *****************************************************************************
 
 ; *****************************************************************************
+; * YIELD 
+; * YIELD EXECUTION FOR 1 FRAME.                                              *
+
+CMD_YLD LDA #$81
+        RTS
+
+; *                                                                           *
+; *****************************************************************************
+
+; *****************************************************************************
 ; * NO FURTHER ACTIONS FOR THIS INSTRUMENT. WE STAY ON THE SAME INSTRUCTION.  *
 
 CMD_END LDA  #$80       ; WE CONSUMED 0 BYTES, Y BIT SET.
@@ -112,3 +129,4 @@ CMD_END LDA  #$80       ; WE CONSUMED 0 BYTES, Y BIT SET.
 
 ; *                                                                           *
 ; *****************************************************************************
+

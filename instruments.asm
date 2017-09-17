@@ -2,9 +2,9 @@
 align 256
 
 INSTTBL WORD INSTRNO
-        WORD INSTR1
-        WORD INSTR2
-        WORD PIANO
+        WORD INSTRNO
+        WORD INSTRNO
+        WORD LEAD1
         WORD SHOT
         WORD SHOT
 
@@ -12,30 +12,24 @@ INSTTBL WORD INSTRNO
         ; yet.
 INSTRNO BYTE $FF        ; END
 
-        ; This is is an example of an instrumet such, for instance, a flute or
-        ; a piano where the length of the note is set in the phrase
-INSTR1  BYTE $25, $03   ; WVR 5, $52            AD
-        BYTE $26, $00   ; SR
-        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
-        BYTE $10        ; WAI (note off)
-        BYTE $24, $10   ; WVR 4, 0              triangle + GATE OFF
-        BYTE $FF        ; END
-
-        ; This is an example of an instument such as a percussion
-        ; that has its own duration regardless of what is set in the phrase
-INSTR2  BYTE $25, $11   ; WVR 5, $52            AD
-        BYTE $26, $F1   ; SR
-        BYTE $24, $81   ; WVR 4, %10000001      NOISE + GATE ON
-        BYTE $01        ; WIN 1                 Init wait to 1 tick
-        BYTE $10        ; WAI (duration set)
-        BYTE $24, $00   ; WVR 4, 0              NOISE + GATE OFF
-        BYTE $FF        ; END
-
-PIANO   BYTE $25, $4F   ; WVR 5, $FF            AD
-        BYTE $26, $00   ; SR
-        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
-        BYTE $10        ; WAI (note off)
-        BYTE $24, $00   ; WVR 4, 0              triangle + GATE OFF
+LEAD1   BYTE $25, $09   ; WVR 5, $FF            AD
+        BYTE $26, $84   ; SR
+        BYTE $23, $4
+        BYTE $22, $00                
+        BYTE $29, $49
+        BYTE $28, $00
+        BYTE $2A, $F4   ; TODO:4 is the voice, filter needs a voice agnostic cmd
+        BYTE $2B, $1F   ; F is the volume should be able to and/or+mask
+        BYTE $24, $41   ; WVR 4, %10000001      triangle + GATE ON
+        BYTE $22, $80
+        BYTE $E0
+        BYTE $22, $00
+        BYTE $15
+        BYTE $24, $40   ; WVR 4, 0              triangle + GATE OFF
+        BYTE $E0
+        BYTE $E0         
+        BYTE $E0                 
+        BYTE $2A, $00
         BYTE $FF        ; END
 
         ; GUNSHOT. THIS IS ACHIEVED WITH WHITE NOISE GATED FOR FOUR TICKS
@@ -49,7 +43,7 @@ SHOT    BYTE $25, $02   ; WRI 5, $02            ATTACK 0MS, DECAY 16MS
         BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
         BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
         BYTE $02        ; WIN 2                 INIT WAIT, 4 TICKS
-        BYTE $10        ; WAI                   WAIT
+        BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END
 

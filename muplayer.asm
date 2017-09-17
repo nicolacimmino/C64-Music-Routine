@@ -126,7 +126,7 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         CLC             ; MOVE THE PHRASP TO THE NEXT ENTRY.
         LDA  #8         ; 
         ADC  PHRASP     ; 
-        STA  PHRASP     ; 
+       STA  PHRASP     ; 
         BCC  *+4        ;
         INC  PHRASP+1   ;
 
@@ -157,7 +157,7 @@ PLAY    LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         BCC  *+4        ;
         INC  INSTRP+1   ;
         
-        TXA             ; RETRIEVE THE RETURN VALUE AND GET BIT 7 WHICH SIGNALS
+        TXA             ; RETRIEVE THE RETURN VALUE AND GET BIT 7 (YEALD FLAG)
         AND  #%10000000 ; WE SHOULD END HERE THE SEQUENCE EXECUTION IF SET.
         BEQ  PLAY
 

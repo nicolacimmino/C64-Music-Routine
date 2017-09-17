@@ -32,7 +32,7 @@ IMC operates on a virtualised SID that exposes the SID 29 registers in just 16 r
 
 The following instructions are available in IMC. Most intructions, once executed, cause the execution of the following instruction to take place immediately, except for those intructions that return a status register with the Yield (Y) flags set. Instructions returning with the Y bit set will cause the player to give up execution for that voice until the next frame triggers a call to the routine.
 
-Each instruction is encoded in the high nibble of the command value. The lower nibble of the same byte is the first, 4 bits, parameter of the instructions, this is referred as P0. Some commands require am other byte to encode an other parameter, this is referred to as P0.
+Each instruction is encoded in the high nibble of the command value. The lower nibble of the same byte is the first, 4 bits, parameter of the instructions, this is referred as P0. Some commands require an other byte to encode an other parameter, this is referred to as P1.
 
 ```
 0          8         16
@@ -42,7 +42,7 @@ Each instruction is encoded in the high nibble of the command value. The lower n
 
 ### WIN - Wait Init ###
 
-Initialises the wait counter to the desired amount of ticks a following wait instruction will have to wait. The amount of ticks to wait is encoded in the lower nibble of the command byte as the amount of ticks/2, this allows waits ranging from 33mS to to 528mS in steps of 33mS. Note that while MUWAIT is an 8 bit register, so can be set for a delay up to 256 ticks (roughly 4 seconds), the WIN instruction allows to set it only up to 32 because of the limited size of P0. This was considered enough for intra-instruction durations, longer durations can be set for the whole note in the track note length byte.
+Initialises the wait counter to the desired amount of ticks a following wait instruction will have to wait. The amount of ticks to wait is encoded in P0 as the amount of ticks/2, this allows waits ranging from 33mS to to 528mS in steps of 33mS. Note that while MUWAIT is an 8 bit register, and can be set for a delay up to 256 ticks (roughly 4 seconds), the WIN instruction allows to set it only up to 32 because of the limited size of P0. This was considered enough for intra-instruction durations, longer durations can be set for the whole note in the track note length byte.
 
 ```
 LENGTH:1        STATUS Y---
@@ -51,15 +51,17 @@ AFFECTS:
 P0 => MUWAIT 
 ```
 
-### WAI - Wait ###
+### LWW - Loop While Waiting ###
 
-Waits the amount of ticks in MUWAIT. This is not an idle wait, the command will set the Y flag so it will cause the virtualised SID to yield and so the other voices will be executed as well. The command will let the flow progress to the next instruction only once MUWAIT reaches zero.
+Waits the amount of ticks in MUWAIT. This is not an idle wait, the command will set the Y flag so it will cause the virtualised SID to yield and the other voices will be executed as well. Additionally INSTRP will be decremented by P0 unless MUWAIT has reached zero in which case the command will let the flow progress to the next instruction.
 
 ```
 LENGTH:1        STATUS Y---
                        1---
 AFFECTS:       
-MUWAIT - 1 => MUWAIT 
+MUWAIT - 1  => MUWAIT
+INSTRP - P0 => INSTRP IF MUWAIT>0
+INSTRP + 1  => INSTRP IF MUWAIT=0
 ```
 
 ### WRI - Write Register ###
@@ -75,7 +77,7 @@ P1 => REG[P0]
 
 ### END - End sequence ###
 
-Ends an instrument commands sequence an yealds. No more code for this instrument will be executed until a new note on it is played.
+Ends an instrument commands sequence and yield. No more code for this instrument will be executed until a new note on it is played.
 
 ```
 LENGTH:1        STATUS Y---

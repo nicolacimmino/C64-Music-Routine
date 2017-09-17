@@ -48,7 +48,8 @@ Initialises the wait counter to the desired amount of ticks a following wait ins
 LENGTH:1        STATUS Y---
                        0---
 AFFECTS:       
-P0 => MUWAIT 
+P0         => MUWAIT
+INSTRP + 1 => INSTRP
 ```
 
 ### LWW - Loop While Waiting ###
@@ -72,7 +73,18 @@ Writes a value into the specified register. This command takes the virtualised S
 LENGTH:2        STATUS Y---
                        0---
 AFFECTS:       
-P1 => REG[P0] 
+P1         => REG[P0] 
+INSTRP + 2 => INSTRP
+```
+### YIELD - Yield execution ###
+
+Yields exection, other voices will be processed and this instruments next instruction will not be executed until the next tick.
+
+```
+LENGTH:1        STATUS Y---
+                       1---
+AFFECTS:       
+INSTRP + 1 => INSTRP
 ```
 
 ### END - End sequence ###

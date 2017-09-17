@@ -76,7 +76,7 @@ AFFECTS:
 P1         => REG[P0] 
 INSTRP + 2 => INSTRP
 ```
-### YIELD - Yield execution ###
+### YLD - Yield execution ###
 
 Yields exection, other voices will be processed and this instruments next instruction will not be executed until the next tick.
 

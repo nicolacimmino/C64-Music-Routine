@@ -45,9 +45,10 @@ VTOFF   =$06            ; 1 BYTES, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
 VTBL    =$10            ; 32 BYTES, VOICE TABLE.
 PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
 INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
-MUWAIT  =$14            ; 2 BYTES, TICKS LEFT FOR WAIT COMMAIN.
-
+MUWAIT  =$14            ; 2 BYTES, TICKS LEFT FOR WAIT COMMAND.
         ; VOICE TABLE ENDS AT $2F.
+
+MAXRST  =$30
 ; *                                                                           *
 ; *****************************************************************************
 
@@ -85,7 +86,10 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         JSR MUINIT
 
         LDA  $DC0D      ; ACKNOWLEDGE CIA INTERRUPTS.
-        
+      
+        LDA  #0
+        STA  MAXRST
+
         CLI             ; LET INTERRUPTS COME.
 
         ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PLAYER RUNS ONLY ONCE PER
@@ -107,6 +111,11 @@ ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
 
         LDA  #0         ; BORDER BACK TO BLACK.
         STA  $D020
+
+        LDA  $D012
+        CMP  MAXRST
+        BMI  *+4
+        STA  MAXRST
 
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 

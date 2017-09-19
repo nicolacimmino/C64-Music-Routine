@@ -5,14 +5,14 @@ INSTTBL WORD INSTRNO
         WORD INSTRNO
         WORD INSTRNO
         WORD LEAD1
-        WORD SHOT
+        WORD LEAD2
         WORD SHOT
 
         ; Null instrument, used for voices where an instrument has not be set 
         ; yet.
 INSTRNO BYTE $FF        ; END
 
-LEAD1   BYTE $25, $09   ; WVR 5, $FF            AD
+LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $26, $84   ; SR
         BYTE $23, $4
         BYTE $22, $00                
@@ -31,6 +31,13 @@ LEAD1   BYTE $25, $09   ; WVR 5, $FF            AD
         BYTE $E0                 
         BYTE $2A, $00
         BYTE $FF        ; END
+
+LEAD2   BYTE $25, $02   ; WVR 5, $FF            AD
+        BYTE $26, $84   ; SR
+        BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
+        BYTE $10
+        BYTE $24, $10   ; WVR 4, %10000001      triangle + GATE ON
+        BYTE $FF
 
         ; GUNSHOT. THIS IS ACHIEVED WITH WHITE NOISE GATED FOR FOUR TICKS
         ; AND THEN FADING OUT WITH A RELEASE OF 750MS. NOTE HOW WE SET THE

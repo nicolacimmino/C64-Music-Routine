@@ -32,9 +32,9 @@
 ; *****************************************************************************
 ; * PAGE ZERO MEMORY MAP                                                      *
 
-TICK    =$03            ; 2 BYTES, CURRENT TICK.
-VOICE   =$05            ; 1 BYTE, CURRENT VOICE (1-3).
-VTOFF   =$06            ; 1 BYTES, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
+TICK    =$03            ; 1 BYTE, CURRENT TICK.
+VOICE   =$04            ; 1 BYTE, CURRENT VOICE (1-3).
+VTOFF   =$05            ; 1 BYTE, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
 
         ; VOICE  TABLE  CONTAINS  4  SETS  OF  REGISTERS THAT KEEP TRACK OF THE 
         ; CURRENT STATUS OF THE PHRASE AND  INSTRUMENT FOR EACH VOICE, EACH SET
@@ -45,7 +45,7 @@ VTOFF   =$06            ; 1 BYTES, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
 VTBL    =$10            ; 32 BYTES, VOICE TABLE.
 PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
 INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
-MUWAIT  =$14            ; 2 BYTES, TICKS LEFT FOR WAIT COMMAND.
+MUWAIT  =$14            ; 1 BYTE, TICKS LEFT FOR WAIT COMMAND.
         ; VOICE TABLE ENDS AT $2F.
 
 MAXRST  =$30

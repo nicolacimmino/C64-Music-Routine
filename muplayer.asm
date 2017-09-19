@@ -18,14 +18,14 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-MUINIT  LDA  #<PHRASE
+MUINIT  LDA  #<PHRASE3
         STA  PHRASP+8   ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE
+        LDA  #>PHRASE3
         STA  PHRASP+9
 
-        LDA  #<PHRASE2
+        LDA  #<PHRASE3
         STA  PHRASP+16  ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE2
+        LDA  #>PHRASE3
         STA  PHRASP+17
 
         LDA  #<PHRASE3
@@ -63,11 +63,9 @@ MUINIT  LDA  #<PHRASE
 ; * THIS IS THE ACTUAL PLAYER ROUTINE ENTRY POINT. NEEDS TO BE CALLED ONCE PER*
 ; * SCREEN.                                                                   *
 
-MUPLAY  INC  TICK       ; NEXT TICK (16 BIT INCREMENT)
-        BNE  *+4
-        INC  TICK+1
-
-        LDA  #3
+MUPLAY  INC  TICK       ; NEXT TICK
+       
+        LDA  #3         ; START TO PLAY FROM VOICE 3
         STA  VOICE
 
 NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
@@ -77,7 +75,6 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         STA  VTOFF      ; 
         TAX             ;
 
-                        
         LDY  #7         ; COPY VOICE VTABLE FOR THE CURRENT VOICE TO THE CURRENT
 @COPY   LDA  VTBL+7,X   ; VTABLE
         STA  VTBL,Y     ;
@@ -86,13 +83,9 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         BPL  @COPY      ;
 
         LDY  #0         ; PHRASP IS POINTING TO THE CURRENT PHRASE ENTRY AND THE
-        LDA  TICK       ; FIRST TWO BYTES ARE THE TICK OF THE NEXT EVENT KEEP 
+        LDA  TICK       ; FIRST BYTES IS THE TICK OF THE NEXT EVENT KEEP 
         CMP  (PHRASP),Y ; PLAYING THE CURRENT INSTRUMENT IF WE HAVE NOT REACHED
         BNE  PLAY       ; THE WANTED TICK YET.
-        INY             ;
-        LDA  TICK+1     ;
-        CMP  (PHRASP),Y ;
-        BNE  PLAY       ;
 
         LDA  #0         ; CALCULATE OFFSET INTO THE VIC REGISTERS FOR THE VOIICE
         LDX  VOICE      ; CURRENTLY PLAYING ((VOICE-1)*7). WE NEED THIS TO STORE
@@ -103,9 +96,14 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         BNE  @LOOP      ; BRANCH ALWAYS, ADC #7 NEVER SETS Z
 
 @DOWR   TAX             ; PRESERVE THE VOICE REGISTER OFFSET IN X
-        LDY  #2         ; BYTE 2 CONTAINS THE MIDI NOTE NUMBER
+@PLAYV  LDY  #1         ; BYTE 1 CONTAINS THE MIDI NOTE NUMBER
         LDA  (PHRASP),Y ; 
-        CLC
+        CMP  #20        ; BELOW 21 WE HAVE TRACK COMMANDS AND NOT MIDI NOTES
+        BPL  @PLAYN
+        JSR  TRKCMD     ; EXECUTE TRACK COMMAD, UPON RETURN PHRASEP WILL HAVE
+        JMP  VEND       ; UPDATED, END THIS VOICE
+
+@PLAYN  CLC             ; PLAY THE NOTE.
         SBC  #21        ; LOOKUP TABLE STARTS FROM MIDI NOTE #21
         ASL             ; OFFSET IN THE MIDI NOTES TABLE * 2
         TAY
@@ -114,7 +112,7 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         LDA  MIDITBL+1,Y; GET FREQUENCY LO
         STA  $D401,X    ;
         
-        LDY  #4         ; BYTE 4 CONTAINS THE INSTRUMENT NUMBER, LOOKUP IN THE
+        LDY  #2         ; BYTE 2 CONTAINS THE INSTRUMENT NUMBER, LOOKUP IN THE
         LDA  (PHRASP),Y ; INSTRTBL THE ADDRESS OF THE FIRST IMICROCODE FOR IT
         ASL             ; AND SET IT IN INSTRP POINTER.
         TAX             ;
@@ -123,14 +121,14 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
         LDA  INSTTBL+1,X;
         STA  INSTRP+1   ;
 
-        LDY  #5         ; BYTE 5 CONTAINS THE DURATION OF THE NOTE.
+        LDY  #3         ; BYTE 3 CONTAINS THE DURATION OF THE NOTE.
         LDA  (PHRASP),Y ; 
         STA  MUWAIT     ;
 
         CLC             ; MOVE THE PHRASP TO THE NEXT ENTRY.
-        LDA  #8         ; 
+        LDA  #4         ; 
         ADC  PHRASP     ; 
-       STA  PHRASP     ; 
+        STA  PHRASP     ; 
         BCC  *+4        ;
         INC  PHRASP+1   ;
 
@@ -165,7 +163,7 @@ PLAY    LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         AND  #%10000000 ; WE SHOULD END HERE THE SEQUENCE EXECUTION IF SET.
         BEQ  PLAY
 
-        LDX  VTOFF      ; COPY THE CURRENT VTABLE BACK TO THE RELEVANT VOICE 
+VEND    LDX  VTOFF      ; COPY THE CURRENT VTABLE BACK TO THE RELEVANT VOICE 
         LDY  #7         ; VTABLE.
 @COPY   LDA  VTBL,Y     ;
         STA  VTBL+7,X   ;
@@ -180,6 +178,17 @@ PLAY    LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         RTS
 ; *                                                                           *
 ; *****************************************************************************
+
+TRKCMD  LDY  #2
+        LDA  (PHRASP),Y
+        TAX
+        INY
+        LDA  (PHRASP),Y
+        STA  PHRASP+1
+        TXA
+        STA  PHRASP
+        
+        RTS
 
 ; *****************************************************************************
 ; * LOOKUP TABLE FOR MIDI NOTES NUMBERS TO FREQUENCY HI/LO SETTINGS.          *

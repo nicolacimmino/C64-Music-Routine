@@ -32,7 +32,6 @@
 ; *****************************************************************************
 ; * PAGE ZERO MEMORY MAP                                                      *
 
-TICK    =$03            ; 1 BYTE, CURRENT TICK.
 VOICE   =$04            ; 1 BYTE, CURRENT VOICE (1-3).
 VTOFF   =$05            ; 1 BYTE, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
 
@@ -46,9 +45,10 @@ VTBL    =$10            ; 32 BYTES, VOICE TABLE.
 PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
 INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
 MUWAIT  =$14            ; 1 BYTE, TICKS LEFT FOR WAIT COMMAND.
+TICK    =$15            ; 1 BYTE, CURRENT TICK.
         ; VOICE TABLE ENDS AT $2F.
 
-MAXRST  =$30
+MAXRST  =$31
 ; *                                                                           *
 ; *****************************************************************************
 

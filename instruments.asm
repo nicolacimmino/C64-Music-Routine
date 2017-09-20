@@ -2,8 +2,6 @@
 align 256
 
 INSTTBL WORD INSTRNO
-        WORD INSTRNO
-        WORD INSTRNO
         WORD LEAD1
         WORD LEAD2
         WORD SHOT

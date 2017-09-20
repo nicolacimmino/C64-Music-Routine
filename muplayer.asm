@@ -18,30 +18,27 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-MUINIT  LDA  #<PHRASE3
+MUINIT  LDX  #24        ; CLEAR ALL SID REGISTERS AND VOICE TABLE
+        LDA  #0
+@LOOP   STA  $D400,X
+        STA  VTBL+8,X 
+        DEX
+        BPL  @LOOP
+        
+        LDA  #<PHRASE1
         STA  PHRASP+8   ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE3
+        LDA  #>PHRASE1
         STA  PHRASP+9
 
-        LDA  #<PHRASE3
+        LDA  #<PHRASE2
         STA  PHRASP+16  ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE3
+        LDA  #>PHRASE2
         STA  PHRASP+17
 
         LDA  #<PHRASE3
         STA  PHRASP+24  ; PHRASE POINTER, WILL COME FROM LOOP
         LDA  #>PHRASE3
         STA  PHRASP+25
-
-        LDX  #24        ; CLEAR ALL SID REGISTERS
-        LDA  #0
-        STA  $D400,X
-        DEX
-        BNE  *-4
-
-        LDA  #0
-        STA  TICK
-        STA  TICK+1
 
                         ;;LDX #0          ; INITIALISE TO INSTRNO
         LDA  INSTTBL    ; INSTRUMENT LSB
@@ -63,9 +60,7 @@ MUINIT  LDA  #<PHRASE3
 ; * THIS IS THE ACTUAL PLAYER ROUTINE ENTRY POINT. NEEDS TO BE CALLED ONCE PER*
 ; * SCREEN.                                                                   *
 
-MUPLAY  INC  TICK       ; NEXT TICK
-       
-        LDA  #3         ; START TO PLAY FROM VOICE 3
+MUPLAY  LDA  #3         ; START TO PLAY FROM VOICE 3
         STA  VOICE
 
 NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
@@ -162,8 +157,10 @@ PLAY    LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         TXA             ; RETRIEVE THE RETURN VALUE AND GET BIT 7 (YEALD FLAG)
         AND  #%10000000 ; WE SHOULD END HERE THE SEQUENCE EXECUTION IF SET.
         BEQ  PLAY
+       
+VEND    INC  TICK       ; NEXT TICK
 
-VEND    LDX  VTOFF      ; COPY THE CURRENT VTABLE BACK TO THE RELEVANT VOICE 
+        LDX  VTOFF      ; COPY THE CURRENT VTABLE BACK TO THE RELEVANT VOICE 
         LDY  #7         ; VTABLE.
 @COPY   LDA  VTBL,Y     ;
         STA  VTBL+7,X   ;
@@ -187,7 +184,9 @@ TRKCMD  LDY  #2
         STA  PHRASP+1
         TXA
         STA  PHRASP
-        
+        LDA  #$FF
+        STA  TICK
+
         RTS
 
 ; *****************************************************************************

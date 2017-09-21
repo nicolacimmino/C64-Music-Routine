@@ -132,7 +132,7 @@ Each phrase element is 32 bits long. The purpose of each bit is different whethe
 | Tick     | 0 | Note    | Instrum  | Duration  |
 ```
 
-*Tick* At which tick this istruction/note is applicable. Tick is 8 bits long, this does not restrict the phrase length to 256 ticks though (roughly 4 seconds) but restricts the maximum period between two entries in the phrase, this is because the track is executed sequentially and not re-scan fom the beginning at each tick. Consider for instance the following sequence:
+**Tick** At which tick this istruction/note is applicable. Tick is 8 bits long, this does not restrict the phrase length to 256 ticks though (roughly 4 seconds) but restricts the maximum period between two entries in the phrase, this is because the track is executed sequentially and not re-scan fom the beginning at each tick. Consider for instance the following sequence:
 
 ```
  $00 .......

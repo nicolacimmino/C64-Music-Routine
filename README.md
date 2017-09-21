@@ -1,5 +1,6 @@
 
 [Instruments](#instruments)
+
 [Phrases](#phrases)
 
 # Instruments #
@@ -171,3 +172,23 @@ AFFECTS:
 LOOP + 1 => LOOP
        0 => PHP
 ```
+
+# Internals #
+
+We will present here internal details of the player routine which are not needed in order to write music but could prove useful to better understand the overall architecture and allow someone to contribute new features.
+
+## VTable ##
+
+The VTable, short for Voice Table, is a 32 bytes table allocated in page zero. It contains 4 sets of 8 registers each. Of these sets 3 are associated with one voice each while the 4th is a copy of the set of registers for the currently playing voice. 
+
+
+| OFF | Sym | Description |
+|---|---|---|
+| 0 |  PHRASPL | Phrase pointer LSB |
+| 1 |  PHRASPH | Phrase pointer MSB |
+| 2 |  INSTRPL | Instrument pointer LSB |
+| 3 |  INSTRPH | Instrument pointer MSB |
+| 4 |  MUWAIT | Ticks left to wait for a WAI |
+| 5 |  TICK | Current tick |
+
+

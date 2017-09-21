@@ -1,5 +1,6 @@
 
 [Instruments](#instruments)
+[Phrases](#phrases)
 
 # Instruments #
 
@@ -116,3 +117,30 @@ The gunshot effect is obtained by gating quickly on and off some white noise wit
         BYTE $FF        ; END
 
 ```
+
+# Phrases #
+
+A phrase is a sequence of notes played on a given instrument (or instruments) with specific intervals. Additionally phraes can contain special elements, referred to as Phrase Instructions that allow to control repetition of the phrase.
+
+## Phrase Elements ##
+
+Each phrase element is 32 bits long. The purpose of each bit is different whether the element is a note or an instruction. Notes have a value below 127 in the second byte while instructions are above that. 
+
+```
+0          8   9   11    16         24         31
+| Tick     | 1 | I | P0  | P1       | P2        |
+| Tick     | 0 | Note    | Instrum  | Duration  |
+```
+
+*Tick* At which tick this istruction/note is applicable. Tick is 8 bits long, this does not restrict the phrase length to 256 ticks though (roughly 4 seconds) but restricts the maximum period between two entries in the phrase, this is because the track is executed sequentially and not re-scan fom the beginning at each tick. Consider for instance the following sequence:
+
+```
+ $00 .......
+ $50 .......
+ $20 .......
+ $F0 .......
+```
+
+The first element will be executed at the first tick, the second at tick $50, tick will progress and wrap around to $00, the phrase pointer though is pointing now at the 3rd entry, so it will wait until tick $20 to execute the second entry and so on, so a phrase is virtually unlimited in length, though it's clearly memory bound.
+
+

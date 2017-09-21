@@ -143,4 +143,31 @@ Each phrase element is 32 bits long. The purpose of each bit is different whethe
 
 The first element will be executed at the first tick, the second at tick $50, tick will progress and wrap around to $00, the phrase pointer though is pointing now at the 3rd entry, so it will wait until tick $20 to execute the second entry and so on, so a phrase is virtually unlimited in length, though it's clearly memory bound.
 
+**I** Instruction. I is two bits long so there is space for up to four instactions. Each instruction can have up to three parameters, **P0** which is 5 bits and **P1** and **P2** which are 8 bits each. See paragraph below "Phrase Instructions" for more details.
 
+**Note** is the MIDI note number. Only MIDI notes 21(A0) through 105(A7) are supported.
+
+**Instrum** the instrument number to be played.
+
+**Duration** the duration of the note in ticks. Note that if the duration+tick exceed the next element tick the next element will play and just override the previously running note. This might be desired in some cases but can also create unwanted audio artifacts as the voice gate will not have chance to be closed while the next instrument sets itself up.
+
+## Phrase Instructions ##
+
+### NOP - No Operation ###
+
+This command does nothing, it's useful though if you need a pause longer than 256 ticks in your phrase as tick wraps around at 256.
+
+```
+AFFECTS:       
+----
+```
+
+### REP - Loop ###
+
+Repeats the phrase a given amount of times, then falls through to the next phrase.
+
+```
+AFFECTS:       
+LOOP + 1 => LOOP
+       0 => PHP
+```

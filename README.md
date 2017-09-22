@@ -1,6 +1,8 @@
 
 [Instruments](#instruments)
 
+[Phrases](#phrases)
+
 # Instruments #
 
 Instruments are defined by making use of a microcode that executes intructions on a virtualised SID. These instructions allow to create intruments that are more complex than it would be possible by just defyning a waveform and an ADSR envelope. Microcoded instruments can evolve all the sound parameters over time, giving access to a more rich sound palette. We will refer to the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
@@ -116,3 +118,77 @@ The gunshot effect is obtained by gating quickly on and off some white noise wit
         BYTE $FF        ; END
 
 ```
+
+# Phrases #
+
+A phrase is a sequence of notes played on a given instrument (or instruments) with specific intervals. Additionally phraes can contain special elements, referred to as Phrase Instructions that allow to control repetition of the phrase.
+
+## Phrase Elements ##
+
+Each phrase element is 32 bits long. The purpose of each bit is different whether the element is a note or an instruction. Notes have a value below 127 in the second byte while instructions are above that. 
+
+```
+0          8   9   11    16         24         31
+| Tick     | 1 | I | P0  | P1       | P2        |
+| Tick     | 0 | Note    | Instrum  | Duration  |
+```
+
+**Tick** At which tick this istruction/note is applicable. Tick is 8 bits long, this does not restrict the phrase length to 256 ticks though (roughly 4 seconds) but restricts the maximum period between two entries in the phrase, this is because the track is executed sequentially and not re-scan fom the beginning at each tick. Consider for instance the following sequence:
+
+```
+ $00 .......
+ $50 .......
+ $20 .......
+ $F0 .......
+```
+
+The first element will be executed at the first tick, the second at tick $50, tick will progress and wrap around to $00, the phrase pointer though is pointing now at the 3rd entry, so it will wait until tick $20 to execute the second entry and so on, so a phrase is virtually unlimited in length, though it's clearly memory bound.
+
+**I** Instruction. I is two bits long so there is space for up to four instactions. Each instruction can have up to three parameters, **P0** which is 5 bits and **P1** and **P2** which are 8 bits each. See paragraph below "Phrase Instructions" for more details.
+
+**Note** is the MIDI note number. Only MIDI notes 21(A0) through 105(A7) are supported.
+
+**Instrum** the instrument number to be played.
+
+**Duration** the duration of the note in ticks. Note that if the duration+tick exceed the next element tick the next element will play and just override the previously running note. This might be desired in some cases but can also create unwanted audio artifacts as the voice gate will not have chance to be closed while the next instrument sets itself up.
+
+## Phrase Instructions ##
+
+### NOP - No Operation ###
+
+This command does nothing, it's useful though if you need a pause longer than 256 ticks in your phrase as tick wraps around at 256.
+
+```
+AFFECTS:       
+----
+```
+
+### REP - Loop ###
+
+Repeats the phrase a given amount of times, then falls through to the next phrase.
+
+```
+AFFECTS:       
+LOOP + 1 => LOOP
+       0 => PHP
+```
+
+# Internals #
+
+We will present here internal details of the player routine which are not needed in order to write music but could prove useful to better understand the overall architecture and allow someone to contribute new features.
+
+## VTable ##
+
+The VTable, short for Voice Table, is a 32 bytes table allocated in page zero. It contains 4 sets of 8 registers each. Of these sets 3 are associated with one voice each while the 4th is a copy of the set of registers for the currently playing voice. 
+
+
+| OFF | Sym | Description |
+|---|---|---|
+| 0 |  PHRASPL | Phrase pointer LSB |
+| 1 |  PHRASPH | Phrase pointer MSB |
+| 2 |  INSTRPL | Instrument pointer LSB |
+| 3 |  INSTRPH | Instrument pointer MSB |
+| 4 |  MUWAIT | Ticks left to wait for a WAI |
+| 5 |  TICK | Current tick |
+
+

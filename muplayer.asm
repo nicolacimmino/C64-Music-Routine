@@ -93,8 +93,8 @@ NEXTV   LDA  VOICE      ; CALCULATE OFFSET OF THE CURRENT VOICE INTO THE VTABLE
 @DOWR   TAX             ; PRESERVE THE VOICE REGISTER OFFSET IN X
 @PLAYV  LDY  #1         ; BYTE 1 CONTAINS THE MIDI NOTE NUMBER
         LDA  (PHRASP),Y ; 
-        CMP  #20        ; BELOW 21 WE HAVE TRACK COMMANDS AND NOT MIDI NOTES
-        BPL  @PLAYN
+        CMP  #%01111111 ; IF BIT7 IS SET THIS IS A TRACK COMMAND.
+        BMI  @PLAYN
         JSR  TRKCMD     ; EXECUTE TRACK COMMAD, UPON RETURN PHRASEP WILL HAVE
         JMP  VEND       ; UPDATED, END THIS VOICE
 
@@ -175,19 +175,6 @@ VEND    INC  TICK       ; NEXT TICK
         RTS
 ; *                                                                           *
 ; *****************************************************************************
-
-TRKCMD  LDY  #2
-        LDA  (PHRASP),Y
-        TAX
-        INY
-        LDA  (PHRASP),Y
-        STA  PHRASP+1
-        TXA
-        STA  PHRASP
-        LDA  #$FF
-        STA  TICK
-
-        RTS
 
 ; *****************************************************************************
 ; * LOOKUP TABLE FOR MIDI NOTES NUMBERS TO FREQUENCY HI/LO SETTINGS.          *

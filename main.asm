@@ -44,8 +44,9 @@ VTOFF   =$05            ; 1 BYTE, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
 VTBL    =$10            ; 32 BYTES, VOICE TABLE.
 PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
 INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
-MUWAIT  =$14            ; 1 BYTE, TICKS LEFT FOR WAIT COMMAND.
+MUWAIT  =$14            ; 1 BYTE, TICKS LEFT FOR IMC WAIT COMMAND.
 TICK    =$15            ; 1 BYTE, CURRENT TICK.
+PHLOOP  =$16            ; 1 BYTE, PHRASE LOOP COUNTER.
         ; VOICE TABLE ENDS AT $2F.
 
 MAXRST  =$31
@@ -128,3 +129,4 @@ incasm "muplayer.asm"
 incasm "imicrocode.asm"
 incasm "instruments.asm"
 incasm "track.asm"
+incasm "trackcmds.asm"

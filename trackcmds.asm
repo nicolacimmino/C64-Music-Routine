@@ -18,21 +18,58 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-        ; TICK, NOTE, INSTR, DUR
+TRKCMD  CLC
+        ROR
+        ROR
+        ROR
+        ROR
+        AND  #%00000111
+        TAX
 
-align 4
+        LDA  TCTABLE,X  ; A BIT OF SELF MODIFYING CODE. MODIFY THE JMP BELOW TO
+        STA  @JMPINS+1  ; POINT TO THE RELEVANT TRACK COMMAND ROUTINE.
+        LDA  TCTABLE+1,X;
+        STA  @JMPINS+2  ;
 
-PHRASE1 BYTE $00, 69, $00, $05
-        BYTE $0F, $A0, <PHRASE1, >PHRASE1       
+        LDY  #1
+        LDA  (PHRASP),Y ; PASS P0 (5 LOWER BITS) TO THE CALLED ROUTINE
+        AND  #%00011111 ; 
 
-PHRASE2 BYTE $00, 69, $00, $05
-        BYTE $10, 71, $00, $05
-        BYTE $1F, $A0, <PHRASE2, >PHRASE2       
+@JMPINS JMP  *          ; EXECUTE THE ACTUAL TRACK COMMAND ROUTINE.
 
-PHRASE3 BYTE $00, 80, $02, $05
-        BYTE $0F, $A5, <PHRASE3, >PHRASE3       
-PHRASE4 BYTE $00, 50, $02, $05
-        BYTE $0F, $A5, <PHRASE4, >PHRASE4       
-PHRASE5 BYTE $00, 90, $02, $05
-        BYTE $0F, $A0, <PHRASE5, >PHRASE5       
-        
+TCTABLE WORD TC_NOP
+        WORD TC_REP
+        WORD TC_NOP
+        WORD TC_NOP
+
+TC_NOP  RTS
+
+TC_REP  INC  PHLOOP     ; INCREMENT LOOP COUNTER
+        CMP  PHLOOP     ; P0 IS IN A, SEE IF WE REACHED WANTED LOOP COUNT
+        BEQ  @NEXTPH    ; ON TO THE NEXT PHRASE.
+
+        LDY  #2         ; MOVE PHRASE POINTER TO THE VALUE POINTED BY 
+        LDA  (PHRASP),Y
+        TAX
+        INY
+        LDA  (PHRASP),Y
+        STA  PHRASP+1
+        TXA
+        STA  PHRASP
+        LDA  #$FF
+        STA  TICK
+
+        RTS
+
+@NEXTPH LDA  #0
+        STA  PHLOOP
+        LDA  #$FF
+        STA  TICK
+        CLC
+        LDA  #4
+        ADC  PHRASP
+        STA  PHRASP
+        BNE  @DONE
+        INC  PHRASP+1
+
+@DONE   RTS

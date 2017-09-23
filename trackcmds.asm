@@ -18,21 +18,21 @@
 ; *                                                                           *
 ; *****************************************************************************
 
-TRKCMD  CLC
-        ROR
-        ROR
-        ROR
-        ROR
-        AND  #%00000111
-        TAX
+TRKCMD  TAY             ; PRESERVE THE CALL ARGUMENT FOR LATER.
+        CLC             ; THE COMMAND IS IN BITS 6 AND 5 OF A, WE ROTATE RIGHT
+        ROR             ; 4 TIMES SO, AND KEEP ONLY THE LOWER 3 BITS TO GET 
+        ROR             ; COMMAND*2.
+        ROR             ;
+        ROR             ;
+        AND  #%00000111 ;
+        TAX             ;
 
         LDA  TCTABLE,X  ; A BIT OF SELF MODIFYING CODE. MODIFY THE JMP BELOW TO
         STA  @JMPINS+1  ; POINT TO THE RELEVANT TRACK COMMAND ROUTINE.
         LDA  TCTABLE+1,X;
         STA  @JMPINS+2  ;
 
-        LDY  #1
-        LDA  (PHRASP),Y ; PASS P0 (5 LOWER BITS) TO THE CALLED ROUTINE
+        TYA             ; GET P0 (LOWER 5 BITS) FROM THE CALL ARGUMENT.
         AND  #%00011111 ; 
 
 @JMPINS JMP  *          ; EXECUTE THE ACTUAL TRACK COMMAND ROUTINE.
@@ -42,13 +42,14 @@ TCTABLE WORD TC_NOP
         WORD TC_NOP
         WORD TC_NOP
 
-TC_NOP  RTS
+TC_REP  CMP  #0         ; P0 IS IN A, IF IT'S ZERO THIS IS AN INFINITE LOOP
+        BEQ  DOREP  
 
-TC_REP  INC  PHLOOP     ; INCREMENT LOOP COUNTER
+        INC  PHLOOP     ; INCREMENT LOOP COUNTER
         CMP  PHLOOP     ; P0 IS IN A, SEE IF WE REACHED WANTED LOOP COUNT
-        BEQ  @NEXTPH    ; ON TO THE NEXT PHRASE.
+        BEQ  NEXTPH     ; ON TO THE NEXT PHRASE.
 
-        LDY  #2         ; MOVE PHRASE POINTER TO THE VALUE POINTED BY 
+DOREP   LDY  #2         ; MOVE PHRASE POINTER TO THE VALUE POINTED BY 
         LDA  (PHRASP),Y
         TAX
         INY
@@ -61,11 +62,11 @@ TC_REP  INC  PHLOOP     ; INCREMENT LOOP COUNTER
 
         RTS
 
-@NEXTPH LDA  #0
+NEXTPH  LDA  #0
         STA  PHLOOP
         LDA  #$FF
         STA  TICK
-        CLC
+TC_NOP  CLC
         LDA  #4
         ADC  PHRASP
         STA  PHRASP

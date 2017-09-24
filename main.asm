@@ -97,7 +97,28 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PLAYER RUNS ONLY ONCE PER
         ; FRAME WHEN THE INTERRUPT HAPPENS.
         
-        JMP  *
+LOOP    LDA  MAXRST     ; PRINT MAXRST IN HEX ON THE SCREEN.
+        CLC
+        ROR
+        ROR
+        ROR
+        ROR
+        JSR  DEC2HEX        
+        STA  $400
+        LDA  MAXRST
+        JSR  DEC2HEX
+        STA  $401
+        JMP  LOOP
+
+DEC2HEX AND  #$0F
+        CMP  #$09
+        BPL  PRINTL
+        CLC
+        ADC  #$30
+        RTS
+PRINTL  CLC
+        SBC  #9
+        RTS
 
 ; *                                                                           *
 ; *****************************************************************************

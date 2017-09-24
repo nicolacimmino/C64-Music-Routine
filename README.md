@@ -88,8 +88,8 @@ LENGTH:2        STATUS Y---
                        0---
 AFFECTS:       
 P0          => SID[FILTER TYPE]
-P1.7-6*FOSC => SID[FILTER CUTOFF]
-P1.4-0      => SID[FILTER RESONANCE]
+P1.7-4      => SID[FILTER RESONANCE]
+P1.1-0*FOSC => SID[FILTER CUTOFF]
 INSTRP + 2 => INSTRP
 ```
 

@@ -42,7 +42,7 @@ TEST1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        BYTE $30        ; FLT 0                 FILTER OFF       
+        ;BYTE $30        ; FLT 0                 FILTER OFF       
         BYTE $FF
 
 TEST2   BYTE $25, $02   ; WVR 5, $FF            AD
@@ -56,7 +56,7 @@ TEST2   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        BYTE $30        ; FLT 0                 FILTER OFF       
+        ;BYTE $30        ; FLT 0                 FILTER OFF       
         BYTE $FF
   
 LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD

@@ -24,20 +24,48 @@ INSTTBL WORD INSTRNO
         WORD LEAD1
         WORD LEAD2
         WORD SHOT
+        WORD TEST1
+        WORD TEST2
 
         ; Null instrument, used for voices where an instrument has not be set 
         ; yet.
 INSTRNO BYTE $FF        ; END
 
+TEST1   BYTE $25, $02   ; WVR 5, $FF            AD
+        BYTE $26, $84   ; SR
+        BYTE $23, $04   ; PULSE WIDTH
+        BYTE $22, $00                
+        BYTE $31, $F0   ; FLT $1, $F4           FILTER LP, RES $F, FOSC MUL 1
+        BYTE $24, $41   ; WVR 4, %10000001      PULSE + GATE ON
+        BYTE $10
+        BYTE $24, $40   ; WVR 4, %10000001      PULSE + GATE OFF
+        BYTE $E0
+        BYTE $E0         
+        BYTE $E0                 
+        BYTE $30        ; FLT 0                 FILTER OFF       
+        BYTE $FF
+
+TEST2   BYTE $25, $02   ; WVR 5, $FF            AD
+        BYTE $26, $84   ; SR
+        BYTE $23, $04   ; PULSE WIDTH
+        BYTE $22, $00                
+        BYTE $31, $F2   ; FLT $1, $F4           FILTER LP, RES $F, FOSC MUL 1
+        BYTE $24, $41   ; WVR 4, %10000001      PULSE + GATE ON
+        BYTE $10
+        BYTE $24, $40   ; WVR 4, %10000001      PULSE + GATE OFF
+        BYTE $E0
+        BYTE $E0         
+        BYTE $E0                 
+        BYTE $30        ; FLT 0                 FILTER OFF       
+        BYTE $FF
+  
 LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $26, $84   ; SR
         BYTE $23, $4
         BYTE $22, $00                
-        BYTE $29, $49
-        BYTE $28, $00
-        BYTE $3F        ; FLT $F                FILTER RESONANCE $F
+
+        ;BYTE $31, $F2   ; FLT $1, $F4            FILTER LP, RES $F, FOSC MUL 1
         
-        BYTE $2B, $1F   ; F is the volume should be able to and/or+mask
         BYTE $24, $41   ; WVR 4, %10000001      triangle + GATE ON
         BYTE $22, $80
         BYTE $E0
@@ -47,7 +75,7 @@ LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        BYTE $30        ; FLT 0                 FILTER OFF
+        ;BYTE $30        ; FLT 0                 FILTER OFF
         BYTE $FF        ; END
 
 LEAD2   BYTE $25, $02   ; WVR 5, $FF            AD

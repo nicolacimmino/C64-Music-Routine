@@ -152,26 +152,48 @@ DOWR    TAX
 ; *****************************************************************************
 
 ; *****************************************************************************
-; * SET FILTER. P0 CONTAINS THE FILTER RESONANCE VALUE. IF P0 IS > 0 WE SET   *
-; * THE INSTRUMENT VOICE TO BE ROUTED THROUGH THE FILTER, WE DON'T ROUTE IT   *
-; * OTHERWISE.                                                                *
+; * SET FILTER. P0 CONTAINS THE FILTER TYPE VALUE. IF P0 IS > 0 WE SET THE    *
+; * INSTRUMENT VOICE TO BE ROUTED THROUGH THE FILTER.                         *                                                                *
 
 CMD_FIL CMP  #0
-        BEQ  @OFF
+        BEQ  FILTOFF
 
-        ASL             ; MOVE FILTER RESONANCE IN HIGER 4 BITS.
-        ASL
-        ASL
-        ASL
-                
-        LDX  VOICE      ; USE A LOOKUP TABLE TO CONVERT VOICE NUMBER TO THE
-        ORA  FCTBL-1,X  ; RIGHT BIT TO SET.
+        ASL             ; MOVE FILTER TYPE IN HIGER 4 BITS.
+        ASL             ;
+        ASL             ;
+        ASL             ;
+        ORA  #%00001111 ; GLOBAL VOLUME IS ALWAYS MAX,
+        STA  $D418
+        
+        LDY  #1         ; P1 HIGHER NIBBLE CONTAINS THE FILTER RESONANCE.
+        LDA  (INSTRP),Y ;
+        TAX             ; PRESERVE P1 FOR LATER USE.
+        AND  #%11110000 ;
+        LDY  VOICE      ; USE A LOOKUP TABLE TO CONVERT VOICE NUMBER TO THE
+        ORA  FCTBL-1,Y  ; RIGHT BIT TO SET.
         STA  $D417      ; 
 
-        LDA  #$01       ; WE CONSUMED 1 BYTE, Y BIT CLEAR.
+        TXA             ; RECOVER P1.
+        AND  #%00000011 ; LOWER BITS ARE THE FOSC FACTOR.
+        TAX             ; FOSC FACTOR IN X.
+
+        CLC             ; Y CONTAINS VOICE NUMBER, CALCULATE REG OFFSET.
+@LOOP   DEY
+        BEQ  @DONE
+        ADC  #7
+        BNE  @LOOP      ; BRANCH ALWAYS, ADC #7 NEVER SETS Z. 
+@DONE   LDA  $D401,Y    ; GET VOICE FREQUENCY HI.
+
+@LOOP2  ASL             ; FACTOR 0 FFILT=FOSC*1.5, FACTOR 2 = *3, FACTOR 3 = *6
+        DEX
+        BNE  @LOOP2
+
+        STA  $D416
+
+        LDA  #$02       ; WE CONSUMED 2 BYTES, Y BIT CLEAR.
         RTS
 
-@OFF    STA  $D417      ; DON'T ROUTE ANY VOICE THROUGH FILTER.
+FILTOFF STA  $D417      ; DON'T ROUTE ANY VOICE THROUGH FILTER.
 
         LDA  #$01       ; WE CONSUMED 1 BYTE, Y BIT CLEAR.
         RTS             

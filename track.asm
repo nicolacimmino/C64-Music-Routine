@@ -32,8 +32,10 @@ PHRASE2 BYTE $00, 69, $00, $05
         BYTE $10, 71, $00, $05
         BYTE $1F, $A0, <PHRASE2, >PHRASE2       
 
-PHRASE3 BYTE $00, 80, $01, $05
-        BYTE $0F, $A5, <PHRASE3, >PHRASE3
+PHRASE3 BYTE $00, 40, $05, $10
+        BYTE $15, 40, $04, $10
+        BYTE $25, $A0, <PHRASE3, >PHRASE3
+
         BYTE $01, $80, $00, $00
 PHRASE4 BYTE $00, 50, $01, $05
         BYTE $0F, $A5, <PHRASE4, >PHRASE4       

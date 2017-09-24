@@ -87,9 +87,9 @@ Sets the filter parameters and enables the filter for this instrument voice.
 LENGTH:2        STATUS Y---
                        0---
 AFFECTS:       
-P0          => SID[FILTER RESONANCE]
+P0          => SID[FILTER TYPE]
 P1.7-6*FOSC => SID[FILTER CUTOFF]
-P1.4-0      => SID[FILTER TYPE]
+P1.4-0      => SID[FILTER RESONANCE]
 INSTRP + 2 => INSTRP
 ```
 

@@ -78,6 +78,23 @@ AFFECTS:
 P1         => REG[P0] 
 INSTRP + 2 => INSTRP
 ```
+
+### FLT - Setup filter ###
+
+Sets the filter parameters and enables the filter for this instrument voice.
+
+```
+LENGTH:2        STATUS Y---
+                       0---
+AFFECTS:       
+P0         => SID[FILTER RESONANCE]
+P1H        => SID[FILTER TYPE]
+P1L        => SID[FILTER CUTOFF H]
+P2         => SID[FILTER CUTOFF L]
+
+INSTRP + 3 => INSTRP
+```
+
 ### YLD - Yield execution ###
 
 Yields exection, other voices will be processed and this instruments next instruction will not be executed until the next tick.

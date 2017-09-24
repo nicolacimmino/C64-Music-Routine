@@ -35,7 +35,8 @@ LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $22, $00                
         BYTE $29, $49
         BYTE $28, $00
-        BYTE $2A, $F4   ; TODO:4 is the voice, filter needs a voice agnostic cmd
+        BYTE $3F        ; FLT $F                FILTER RESONANCE $F
+        
         BYTE $2B, $1F   ; F is the volume should be able to and/or+mask
         BYTE $24, $41   ; WVR 4, %10000001      triangle + GATE ON
         BYTE $22, $80
@@ -46,7 +47,7 @@ LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        BYTE $2A, $00
+        BYTE $30        ; FLT 0                 FILTER OFF
         BYTE $FF        ; END
 
 LEAD2   BYTE $25, $02   ; WVR 5, $FF            AD

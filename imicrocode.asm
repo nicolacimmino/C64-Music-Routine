@@ -67,7 +67,7 @@ IMCPLAY LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
 CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
         WORD CMD_LWW           ; 0X10   LOOP WHILE WAITING
         WORD CMD_WRI           ; 0X20   WRITE REGISTER
-        WORD $0000
+        WORD CMD_FIL           ; 0x30   SET FILTER ON/OFF FOR THE INSTRUMENT
         WORD $0000
         WORD $0000
         WORD $0000
@@ -152,10 +152,40 @@ DOWR    TAX
 ; *****************************************************************************
 
 ; *****************************************************************************
+; * SET FILTER. P0 CONTAINS THE FILTER RESONANCE VALUE. IF P0 IS > 0 WE SET   *
+; * THE INSTRUMENT VOICE TO BE ROUTED THROUGH THE FILTER, WE DON'T ROUTE IT   *
+; * OTHERWISE.                                                                *
+
+CMD_FIL CMP  #0
+        BEQ  @OFF
+
+        ASL             ; MOVE FILTER RESONANCE IN HIGER 4 BITS.
+        ASL
+        ASL
+        ASL
+                
+        LDX  VOICE      ; USE A LOOKUP TABLE TO CONVERT VOICE NUMBER TO THE
+        ORA  FCTBL-1,X  ; RIGHT BIT TO SET.
+        STA  $D417      ; 
+
+        LDA  #$01       ; WE CONSUMED 1 BYTE, Y BIT CLEAR.
+        RTS
+
+@OFF    STA  $D417      ; DON'T ROUTE ANY VOICE THROUGH FILTER.
+
+        LDA  #$01       ; WE CONSUMED 1 BYTE, Y BIT CLEAR.
+        RTS             
+
+FCTBL   BYTE %00000001, %00000010, %00000100
+ 
+; *                                                                           *
+; *****************************************************************************
+        
+; *****************************************************************************
 ; * YIELD 
 ; * YIELD EXECUTION FOR 1 FRAME.                                              *
 
-CMD_YLD LDA #$81
+CMD_YLD LDA  #$81
         RTS
 
 ; *                                                                           *

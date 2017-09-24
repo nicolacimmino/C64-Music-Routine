@@ -87,12 +87,10 @@ Sets the filter parameters and enables the filter for this instrument voice.
 LENGTH:2        STATUS Y---
                        0---
 AFFECTS:       
-P0         => SID[FILTER RESONANCE]
-P1H        => SID[FILTER TYPE]
-P1L        => SID[FILTER CUTOFF H]
-P2         => SID[FILTER CUTOFF L]
-
-INSTRP + 3 => INSTRP
+P0          => SID[FILTER RESONANCE]
+P1.7-6*FOSC => SID[FILTER CUTOFF]
+P1.4-0      => SID[FILTER TYPE]
+INSTRP + 2 => INSTRP
 ```
 
 ### YLD - Yield execution ###

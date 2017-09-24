@@ -84,7 +84,7 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         LDA  #%00000001 ; ENABLE RASTER INTERRUPT.
         STA  $D01A      ;
         
-        JSR MUINIT
+        JSR  MUINIT
 
         LDA  $DC0D      ; ACKNOWLEDGE CIA INTERRUPTS.
       
@@ -126,7 +126,4 @@ ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
 ; *****************************************************************************
 
 incasm "muplayer.asm"
-incasm "imicrocode.asm"
-incasm "instruments.asm"
 incasm "track.asm"
-incasm "trackcmds.asm"

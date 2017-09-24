@@ -22,6 +22,46 @@
 ; *****************************************************************************
 
 ; *****************************************************************************
+; * INVOKED ONCE PER TICK PER VOICE EXECUTES THE NEXT IMC INSTRUCTIONS UNTIL  *
+; * THE Y (YIELD) FLAG IS SET.                                                *
+
+IMCPLAY LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
+        LDA  (INSTRP),Y ; INSTRP.
+
+        ROR             ; THE HIGH NIBBLE IS THE ACTAL COMMAND, SO THE OFFSET
+        ROR             ; INTO THE COMMAND TABLE IS THAT*2.
+        ROR             ;
+        AND  #%00011110 ;
+        TAX             ;
+
+        LDA  CMDTBL,X   ; A BIT OF SELF MODIFYING CODE. MODIFY THE JSR BELOW TO
+        STA  @JSRINS+1  ; POINT TO THE RELEVANT IMICROCODE INSTRUCTION ROUTINE.
+        LDA  CMDTBL+1,X ;
+        STA  @JSRINS+2  ;
+
+        LDA  (INSTRP),Y ; PASS LOW NIBBLE OF COMMAND TO THE CALLED ROUTINE, THIS
+        AND  #%00001111 ; IS THE ARGUMENT.
+
+@JSRINS JSR  *          ; EXECUTE THE ACTUAL IMICROCODE INSTRUCTION.
+        
+        TAX             ; KEEP A COPY OF THE RETURN VALUE.
+        AND  #%00001111 ; ROUTINE RETURNS IN A LOWER NIBBLE THE AMOUNT OF CMD
+        CLC             ; MEMORY BYTES CONSUMED. MOVE INSTRP ACCORDINGLY.
+        ADC  INSTRP     ; 
+        STA  INSTRP     ; 
+        BCC  *+4        ;
+        INC  INSTRP+1   ;
+        
+        TXA             ; RETRIEVE THE RETURN VALUE AND GET BIT 7 (YEALD FLAG)
+        AND  #%10000000 ; WE SHOULD END HERE THE SEQUENCE EXECUTION IF SET.
+        BEQ  IMCPLAY
+
+        RTS
+
+; *                                                                           *
+; *****************************************************************************
+
+; *****************************************************************************
 ; *                                                                           *
 
 CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT

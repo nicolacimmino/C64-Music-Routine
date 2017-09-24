@@ -42,6 +42,7 @@
         <FileName>muplayer.asm</FileName>
         <FileName>track.asm</FileName>
         <FileName>trackcmds.asm</FileName>
+        <FileName>scale.asm</FileName>
     </BuildList>
     <DetermineBuildOrder>0</DetermineBuildOrder>
     <PaddingByte>234</PaddingByte>
@@ -81,6 +82,17 @@
         </SourceFile>
         <SourceFile>
             <Name>muplayer.asm</Name>
+            <PrgName />
+            <FileType>2</FileType>
+            <IncludeInBuild>True</IncludeInBuild>
+            <Regions />
+            <Breakpoints />
+            <Bookmarks />
+            <Topmost>False</Topmost>
+            <FileOpen>True</FileOpen>
+        </SourceFile>
+        <SourceFile>
+            <Name>scale.asm</Name>
             <PrgName />
             <FileType>2</FileType>
             <IncludeInBuild>True</IncludeInBuild>

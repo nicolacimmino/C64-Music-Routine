@@ -129,7 +129,7 @@ AFFECTS:
 
 ### Gunshot ### 
 
-The gunshot effect is obtained by gating quickly on and off some white noise with an envelope decaying slowly. This gives the initial bang followed by a tail of fading noise. We set the voice frequency to 622Hz, noise in the SID is colored, so setting a frequency actually has an effect.
+The gunshot effect is obtained by gating quickly on and off some noise with an envelope decaying slowly. This gives the initial bang followed by a tail of fading noise. We set the voice frequency to 622Hz, noise in the SID is colored, so setting a frequency actually has an effect.
 
 ```
         BYTE $25, $02   ; WRI 5, $02            ATTACK 0MS, DECAY 16MS
@@ -138,10 +138,9 @@ The gunshot effect is obtained by gating quickly on and off some white noise wit
         BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
         BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
         BYTE $02        ; WIN 2                 INIT WAIT, 4 TICKS
-        BYTE $10        ; WAI                   WAIT
+        BYTE $10        ; LWW                   LOOP (HERE) WHILE WAITING THE 4 TICKS
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END
-
 ```
 
 # Phrases #
@@ -194,9 +193,34 @@ Repeats the phrase a given amount of times, then falls through to the next phras
 
 ```
 AFFECTS:       
-LOOP + 1 => LOOP
-       0 => PHP
+LOOP + 1 => LOOP IF LOOP < P0
+       0 => LOOP IF LOOP < P0
+       0 => TICK
+P1.P2    => PHRASP IF LOOP < P0
+PHRASP+1 => PHRASP IF LOOP = P0
 ```
+
+## Examples ##
+
+This is an example of a simple endless loop playing two different notes on the same instrument.
+
+```
+  PHRASE  BYTE 00, 40, 04, 10              ; AT TICK 0 PLAY NOTE 40 ON INSTRUMENT 4 FOR 10 TICKS.
+          BYTE 15, 70, 04, 10              ; AT TICK 15 PLAY NOTE 70 ON INSTRUMENT 4 FOR 10 TICKS.
+          BYTE 25, $A0, <PHRASE, >PHRASE   ; AT TICK 25 GO INFINITE TIMES ($A0) TO PHRASE.
+```
+
+This is an example of a pharse repeating a certain amount of times (eg an intro) and then falling through to the next phrase which, in this examples plays forever, but could be simply chained to others phrases.
+
+```
+  PHRASE  BYTE 00, 40, 04, 10              ; AT TICK 0 PLAY NOTE 40 ON INSTRUMENT 4 FOR 10 TICKS.
+          BYTE 15, 70, 04, 10              ; AT TICK 15 PLAY NOTE 70 ON INSTRUMENT 4 FOR 10 TICKS.
+          BYTE 25, $A5, <PHRASE, >PHRASE   ; AT TICK 25 GO 5 TIMES ($A0) BACK TO PHRASE.
+  PHRASE2 BYTE 00, 40, 05, 10              ; AT TICK 0 PLAY NOTE 40 ON INSTRUMENT 5 FOR 10 TICKS.
+          BYTE 15, 70, 04, 10              ; AT TICK 15 PLAY NOTE 70 ON INSTRUMENT 4 FOR 10 TICKS.
+          BYTE 25, $A0, <PHRASE2, >PHRASE2 ; AT TICK 25 GO INFINITE TIMES ($A0) TO PHRASE2.         
+```
+
 
 # Internals #
 

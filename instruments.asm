@@ -32,7 +32,7 @@ INSTTBL WORD INSTRNO
 INSTRNO BYTE $FF        ; END
 
 TEST1   BYTE $25, $02   ; WVR 5, $FF            AD
-        BYTE $26, $84   ; SR
+        BYTE $26, $F2   ; SR
         BYTE $23, $04   ; PULSE WIDTH
         BYTE $22, $00                
         BYTE $31, $F0   ; FLT $1, $F4           FILTER LP, RES $F, FOSC MUL 1
@@ -42,7 +42,7 @@ TEST1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        ;BYTE $30        ; FLT 0                 FILTER OFF       
+        BYTE $30        ; FLT 0                 FILTER OFF       
         BYTE $FF
 
 TEST2   BYTE $25, $02   ; WVR 5, $FF            AD
@@ -56,7 +56,7 @@ TEST2   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $E0
         BYTE $E0         
         BYTE $E0                 
-        ;BYTE $30        ; FLT 0                 FILTER OFF       
+        BYTE $30        ; FLT 0                 FILTER OFF       
         BYTE $FF
   
 LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
@@ -79,7 +79,7 @@ LEAD1   BYTE $25, $02   ; WVR 5, $FF            AD
         BYTE $FF        ; END
 
 LEAD2   BYTE $25, $02   ; WVR 5, $FF            AD
-        BYTE $26, $84   ; SR
+        BYTE $26, $F4   ; SR
         BYTE $24, $11   ; WVR 4, %10000001      triangle + GATE ON
         BYTE $10
         BYTE $24, $10   ; WVR 4, %10000001      triangle + GATE ON

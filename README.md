@@ -81,17 +81,27 @@ INSTRP + 2 => INSTRP
 
 ### FLT - Setup filter ###
 
-Sets the filter parameters and enables the filter for this instrument voice.
+Sets the filter parameters and enables the filter for this instrument voice. P0 contains the filter type (HP=4, BP=2, LP=
+1). P1 higer nibble contains the filter resonance while the lower two bits set the filter cutoff/center frequency as a product of the current voice frequency by a constant (1.5, 3, 6), this simplifies having the filter to track the current note being played.
 
 ```
 LENGTH:2        STATUS Y---
                        0---
 AFFECTS:       
-P0          => SID[FILTER TYPE]
-P1.7-4      => SID[FILTER RESONANCE]
-P1.1-0*FOSC => SID[FILTER CUTOFF]
-INSTRP + 2 => INSTRP
+P0             => SID[FILTER TYPE]
+P1.7-4         => SID[FILTER RESONANCE]
+K[P1.1-0]*FOSC => SID[FILTER CUTOFF]
+INSTRP + 2     => INSTRP
+
+K IS A FOSC MULTIPLIER SET ACCORDING TO THE FOLLOWING VALUES OF THE TWO LOWER BITS OF P1:
+
+  | P1.1 | P1.0 |  K  |
+  |   0  |   0  | 1.5 |
+  |   0  |   1  |  3  |
+  |   1  |   0  |  6  |
 ```
+
+*NOTE* Since there is only one filter in the SID it's up to the composer to make use of only one instrument that requires a filter at a given time. Also, since moving the filter voice selector creates a click it's advisable to use instruments that require filtering on only one voice throughout the song. Anyhow the commands allow to freely choose which which are passed through the filter as, on occasions, it might be desirable to have more than one voice going through the same filter.
 
 ### YLD - Yield execution ###
 

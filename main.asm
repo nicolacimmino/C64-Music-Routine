@@ -1,6 +1,6 @@
 ; *****************************************************************************
 ; *                                                                           *
-; * COPYRIGHT (C) 2017 NICOLA CIMMINO                                         *
+; * COPYRIGHT (C) 2018 NICOLA CIMMINO                                         *
 ; *                                                                           *
 ; *   THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY    *
 ; *   IT UNDER THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY    *
@@ -20,8 +20,8 @@
 
 ; *****************************************************************************
 ; * BELOW ARE TBE BASIC TOKENS FOR 10 SYS49152                                *
-; * WE STORE THEM AT THE BEGINNING OF THE BASIC RAM SO WHEN WE CAN LOAD       *
-; * THE PROGRAM WITH AUTORUN (LOAD "*",8,1) AND SAVE TO TYPE THE SYS.         *
+; * WE STORE THEM AT THE BEGINNING OF BASIC RAM SO WHEN WE LOAD THE PROGRAM   *
+; * WITH AUTORUN (LOAD "*",8,1) IT WILL START AUTOMATICALLY.                  *
 
 *=$801
 

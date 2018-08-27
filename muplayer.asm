@@ -1,6 +1,6 @@
 ; *****************************************************************************
 ; *                                                                           *
-; * COPYRIGHT (C) 2017 NICOLA CIMMINO                                         *
+; * COPYRIGHT (C) 2018 NICOLA CIMMINO                                         *
 ; *                                                                           *
 ; *   THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY    *
 ; *   IT UNDER THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY    *
@@ -34,22 +34,22 @@ MUINIT  LDX  #24        ; CLEAR ALL SID REGISTERS AND VOICE TABLE
         LDA  #14
         STA  SROFF+24
         
-        LDA  #<PHRASE1
-        STA  PHRASP+8   ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE1
+        LDA  TRACK      ; VOICE 1 INITIAL PHRASE POINTER
+        STA  PHRASP+8   
+        LDA  TRACK+1
         STA  PHRASP+9
 
-        LDA  #<PHRASE2
-        STA  PHRASP+16  ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE2
+        LDA  TRACK+2
+        STA  PHRASP+16  ; VOICE 2 INITIAL PHRASE POINTER
+        LDA  TRACK+3
         STA  PHRASP+17
 
-        LDA  #<PHRASE3
-        STA  PHRASP+24  ; PHRASE POINTER, WILL COME FROM LOOP
-        LDA  #>PHRASE3
+        LDA  TRACK+4
+        STA  PHRASP+24  ; VOICE 3 INITIAL PHRASE POINTER
+        LDA  TRACK+5
         STA  PHRASP+25
 
-                        ;;LDX #0          ; INITIALISE TO INSTRNO
+                        ; INITIALISE TO INSTRNO
         LDA  INSTTBL    ; INSTRUMENT LSB
         STA  INSTRP+8
         STA  INSTRP+16

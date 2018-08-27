@@ -1,6 +1,6 @@
 ; *****************************************************************************
 ; *                                                                           *
-; * COPYRIGHT (C) 2017 NICOLA CIMMINO                                         *
+; * COPYRIGHT (C) 2018 NICOLA CIMMINO                                         *
 ; *                                                                           *
 ; *   THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY    *
 ; *   IT UNDER THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY    *

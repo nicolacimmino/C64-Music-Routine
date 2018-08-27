@@ -1,6 +1,6 @@
 ; *****************************************************************************
 ; *                                                                           *
-; * COPYRIGHT (C) 2017 NICOLA CIMMINO                                         *
+; * COPYRIGHT (C) 2018 NICOLA CIMMINO                                         *
 ; *                                                                           *
 ; *   THIS PROGRAM IS FREE SOFTWARE: YOU CAN REDISTRIBUTE IT AND/OR MODIFY    *
 ; *   IT UNDER THE TERMS OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY    *
@@ -23,7 +23,12 @@ incasm "scale.asm"
 
         ; TICK, NOTE, INSTR, DUR
 
-align 4
+TRACK   BYTE <PHRASE1, >PHRASE1
+        BYTE <PHRASE2, >PHRASE2
+        BYTE <PHRASE3, >PHRASE3
+        BYTE $00, $00
+
+        align 4
 
 PHRASE1 BYTE $00, 69, $00, $05
         BYTE $0F, $A0, <PHRASE1, >PHRASE1       

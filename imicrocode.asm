@@ -174,13 +174,14 @@ CMD_FIL CMP  #0
         TAX             ; FOSC FACTOR IN X.
 
         LDY  SROFF      ; SID VOICE REGISTERS OFFSET FROM VATABLE.
-@DONE   LDA  $D401,Y    ; GET VOICE FREQUENCY HI.
+        LDA  $D401,Y    ; GET VOICE FREQUENCY HI.
 
-@LOOP2  ASL             ; FACTOR 0 FFILT=FOSC*1.5, FACTOR 2 = *3, FACTOR 3 = *6
-        DEX
-        BNE  @LOOP2
+@LOOP2  DEX             ; SHIFT THE HIGH FREQUENCY BYTE BY FACTOR TIMES
+        BEQ  @DONE      ; FACTOR 0 FFILT=FOSC*1.5, FACTOR 2 = *3, FACTOR 3 = *6
+        ASL             ;
+        BNE  @LOOP2     ;
 
-        STA  $D416
+@DONE   STA  $D416
 
         LDA  #$02       ; WE CONSUMED 2 BYTES, Y BIT CLEAR.
         RTS

@@ -79,6 +79,24 @@ P1         => REG[P0]
 INSTRP + 2 => INSTRP
 ```
 
+### VIN - Voice Initialisation ###
+
+Writes in bulk all 7 registers of the voice. The command is followed by 7 bytes for the values 0-6 of the virtualised SID registers. 
+
+```
+LENGTH:8        STATUS Y---
+                       0---
+AFFECTS:       
+P1         => REG[0] 
+P2         => REG[1] 
+P3         => REG[2] 
+P4         => REG[3] 
+P5         => REG[4] 
+P6         => REG[5] 
+P7         => REG[6] 
+INSTRP + 8 => INSTRP
+```
+
 ### FLT - Setup filter ###
 
 Sets the filter parameters and enables the filter for this instrument voice. P0 contains the filter type (HP=4, BP=2, LP=
@@ -142,6 +160,37 @@ The gunshot effect is obtained by gating quickly on and off some noise with an e
         BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
         BYTE $FF        ; END
 ```
+
+### Drum ###
+
+The drum is obtained with a slowly (D=240ms) fading sequence of triangle,noise,triangle and pulse. Noise is at around 700Hz while the other waveforms are all played at around 220Hz.
+
+![drum](images/drum.png)
+
+```
+DRUM1   BYTE $40, $8F, $0E, $00, $08, $10, $00, $F7
+                        ; VIN FREQ=220Hz, PW=50%,TRIANGLE, GATE OFF,
+                        ; A=2mS D=6mS S=15  R=240ms            
+        BYTE $24, $11   ; WRI 4, %00010001      TRIANGLE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
+        BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $21, $0E   ; WVR 1, $0E            FREQ=220Hz
+        BYTE $24, $11   ; WRI 4, %00010001      TRIANGLE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $24, $41   ; WRI 4, %01000001      PULSE, GATE ON        
+        BYTE $E0        ; YLD
+        
+        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
+        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF
+        
+        BYTE $FF        ; END
+```
+
 
 # Phrases #
 

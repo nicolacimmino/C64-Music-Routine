@@ -143,6 +143,37 @@ The gunshot effect is obtained by gating quickly on and off some noise with an e
         BYTE $FF        ; END
 ```
 
+### Drum ###
+
+The drum is obtained with a slowly (D=240ms) fading sequence of triangle,noise,triangle and pulse. Noise is at around 700Hz while the other waveforms are all played at around 220Hz.
+
+![drum](images/drum.png)
+
+```
+DRUM1   BYTE $40, $8F, $0E, $00, $08, $10, $00, $F7
+                        ; VIN FREQ=220Hz, PW=50%,TRIANGLE, GATE OFF,
+                        ; A=2mS D=6mS S=15  R=240ms            
+        BYTE $24, $11   ; WRI 4, %00010001      TRIANGLE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
+        BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $21, $0E   ; WVR 1, $0E            FREQ=220Hz
+        BYTE $24, $11   ; WRI 4, %00010001      TRIANGLE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $24, $41   ; WRI 4, %01000001      PULSE, GATE ON        
+        BYTE $E0        ; YLD
+        
+        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
+        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF
+        
+        BYTE $FF        ; END
+```
+
+
 # Phrases #
 
 A phrase is a sequence of notes played on a given instrument (or instruments) with specific intervals. Additionally phraes can contain special elements, referred to as Phrase Instructions that allow to control repetition of the phrase.

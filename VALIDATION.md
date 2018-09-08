@@ -63,6 +63,7 @@ TEST1   BYTE $40, $8F, $0E, $00, $08, $11, $00, $F7
 
 The VWR command works as expected on all voices.  A monitor is used to inspect the SID registers, all 3 voices are expected to be setup with the values as in the dump below.
 
+```
 >M D400 D41F
 C:d400  8f 0e 00 08  11 00 f7 8f  0e 00 08 11  00 f7 8f 0e  00 08 11 00  f7 00 00 00  0f 00 00 00  00 00 00 00
 ```

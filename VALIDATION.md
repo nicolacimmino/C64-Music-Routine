@@ -1,4 +1,11 @@
 
+# Method #
+
+In order to verify that the code works as expected a series of tests have been run. The general method is to define a test intrument, with certain characteristics that exercise a particular feature of the player and use that instrument, in isolation, on a voice. The sound output has then been sampled and visually analyzed in Audacity to match the expected signal.
+
+## YLD Test ##
+
+Verify that the the YLD command yealds for 1 tick. Each step of the triangle/noise/triangle/pulse sequence is expected to last 20mS (one tick).
 
 ````ASM
 DRUM1   BYTE $25, $00   ; WVR 5, $00            A=2mS D=6mS
@@ -26,5 +33,7 @@ DRUM1   BYTE $25, $00   ; WVR 5, $00            A=2mS D=6mS
                 
         BYTE $FF        ; END
 ````        
+
+Sampled output:
 
 ![drum1](images/validation_drum_1.png)

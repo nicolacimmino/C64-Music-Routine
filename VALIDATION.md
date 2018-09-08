@@ -59,9 +59,9 @@ TEST1   BYTE $40, $8F, $0E, $00, $08, $11, $00, $F7
         BYTE $FF
 ```
 
-### VWR Test ###
+### VOI Test ###
 
-The VWR command works as expected on all voices.  A monitor is used to inspect the SID registers, all 3 voices are expected to be setup with the values as in the dump below.
+The VOI command works as expected on all voices.  A monitor is used to inspect the SID registers, all 3 voices are expected to be setup with the values as in the dump below.
 
 ```
 >M D400 D41F

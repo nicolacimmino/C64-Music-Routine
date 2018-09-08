@@ -79,6 +79,24 @@ P1         => REG[P0]
 INSTRP + 2 => INSTRP
 ```
 
+### VIN - Voice Initialisation ###
+
+Writes in bulk all 7 registers of the voice. The command is followed by 7 bytes for the values 0-6 of the virtualised SID registers. 
+
+```
+LENGTH:8        STATUS Y---
+                       0---
+AFFECTS:       
+P1         => REG[0] 
+P2         => REG[1] 
+P3         => REG[2] 
+P4         => REG[3] 
+P5         => REG[4] 
+P6         => REG[5] 
+P7         => REG[6] 
+INSTRP + 8 => INSTRP
+```
+
 ### FLT - Setup filter ###
 
 Sets the filter parameters and enables the filter for this instrument voice. P0 contains the filter type (HP=4, BP=2, LP=

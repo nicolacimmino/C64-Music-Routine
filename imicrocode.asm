@@ -68,7 +68,7 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
         WORD CMD_LWW           ; 0X10   LOOP WHILE WAITING
         WORD CMD_WRI           ; 0X20   WRITE REGISTER
         WORD CMD_FIL           ; 0x30   SET FILTER ON/OFF FOR THE INSTRUMENT
-        WORD $0000
+        WORD CMD_VIN           ; 0x40   VOICE INIT
         WORD $0000
         WORD $0000
         WORD $0000
@@ -86,12 +86,12 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
 
 ; *****************************************************************************
 ; * WAIT INIT                                                                 *
-; * INITIALISES THE WAIT COUNTER. TAKES THE NUMBER OF TICKS in P0.            *
+; * INITIALISES THE WAIT COUNTER. TAKES THE NUMBER OF TICKS/2 in P0.          *
 
 CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
         ASL
         STA  MUWAIT             ; 
-        LDA  #$01               ; RETURN TOAL CONSUMED 1 BYTE, Y BIT CLEAR.
+        LDA  #$01               ; RETURN TOTAL CONSUMED 1 BYTE, Y BIT CLEAR.
         RTS
 
 ; *                                                                           *
@@ -103,7 +103,7 @@ CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
 
 CMD_LWW DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
         BNE  @LOOP              ; NOT ZERO YET?
-        LDA  #$81               ; WE REACHED ZERO, RETURN 1, Y BIT SET.        
+        LDA  #$81               ; WE REACHED ZERO, 1 BYTE CONSUMED, Y BIT SET.
         RTS
 @LOOP   CLC             
         EOR  #$FF        
@@ -113,7 +113,7 @@ CMD_LWW DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
         STA  INSTRP
         BPL  @DONE
         DEC  INSTRP+1
-@DONE   LDA  #$80               ; ASSUME WE WILL RETURN ZERO, Y BIT SET.                  
+@DONE   LDA  #$80               ; ZERO BYTES CONSUMED FOR NOW, Y BIT SET.                  
         RTS
 
 ; *                                                                           *
@@ -142,6 +142,29 @@ DOWR    TAX
         STA  $D400,X
 
         LDA  #$02       ; WE CONSUMED 2 BYTES, Y BIT CLEAR.
+        RTS
+
+; *                                                                           *
+; *****************************************************************************
+
+; *****************************************************************************
+; * VOICE INIT.                                                               *
+; *                                                                           *
+; * BULK INITIALISE ALL 7 VOICE REGISTERS.                                    *
+
+CMD_VIN LDA  SROFF      ; FIRST VOICE OFFSET IN THE VOICE REGISTERS.
+        CLC
+        ADC  #6
+        TAX
+        
+        LDY  #7
+@LOOP   LDA  (INSTRP),Y
+        STA  $D400,X        
+        DEX        
+        DEY
+        BNE  @LOOP
+
+        LDA  #$08       ; WE CONSUMED 8 BYTES, Y BIT CLEAR.
         RTS
 
 ; *                                                                           *
@@ -200,8 +223,8 @@ FCTBL   BYTE %00000001, %00000010, %00000100
 ; *****************************************************************************
         
 ; *****************************************************************************
-; * YIELD 
-; * YIELD EXECUTION FOR 1 FRAME.                                              *
+; * YIELD                                                                     *
+; * YIELD EXECUTION FOR 1 TICK.                                               *
 
 CMD_YLD LDA  #$81
         RTS

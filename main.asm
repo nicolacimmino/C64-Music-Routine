@@ -116,7 +116,7 @@ DEC2HEX AND  #$0F
         CLC
         ADC  #$30
         RTS
-PRINTL  CLC
+PRINTL  SEC
         SBC  #9
         RTS
 

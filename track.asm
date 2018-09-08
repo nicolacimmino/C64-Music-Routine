@@ -24,22 +24,22 @@ incasm "scale.asm"
         ; TICK, NOTE, INSTR, DUR
 
 TRACK   BYTE <PHRASE1, >PHRASE1
-        BYTE <PHRASE2, >PHRASE2
-        BYTE <PHRASE3, >PHRASE3
+        BYTE <PHRASE0, >PHRASE0
+        BYTE <PHRASE0, >PHRASE0
         BYTE $00, $00
 
         align 4
 
-PHRASE1 BYTE $00, 69, $00, $05
-        BYTE $0F, $A0, <PHRASE1, >PHRASE1       
+PHRASE0 BYTE $FF, $A0, <PHRASE0, >PHRASE0       
 
-PHRASE2 BYTE $00, 69, $00, $05
-        BYTE $10, 71, $00, $05
-        BYTE $1F, $A0, <PHRASE2, >PHRASE2       
+PHRASE1 BYTE $00, 00, $06, $00
+        BYTE $5F, $A0, <PHRASE1, >PHRASE1       
 
-PHRASE3 BYTE $00, 40, $04, $10
-        BYTE $15, 70, $04, $10
-        BYTE $25, $A0, <PHRASE3, >PHRASE3
+PHRASE2 BYTE $00, 00, $06, $00        
+        BYTE $5F, $A0, <PHRASE2, >PHRASE2       
+
+PHRASE3 BYTE $00, 00, $06, $00
+        BYTE $5f, $A0, <PHRASE3, >PHRASE3
 
         BYTE $01, $80, $00, $00
 PHRASE4 BYTE $00, 50, $01, $05

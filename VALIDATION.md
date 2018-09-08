@@ -49,3 +49,20 @@ Verify that the END command correctly terminates the execution of the IMC sequen
 Sampled output:
 
 ![drum1](images/validation_drum_1.png)
+
+## TEST 2 ##
+
+The following instrument is applied to all voices.
+
+```ASM
+TEST1   BYTE $40, $8F, $0E, $00, $08, $11, $00, $F7
+        BYTE $FF
+```
+
+### VWR Test ###
+
+The VWR command works as expected on all voices.  A monitor is used to inspect the SID registers, all 3 voices are expected to be setup with the values as in the dump below.
+
+>M D400 D41F
+C:d400  8f 0e 00 08  11 00 f7 8f  0e 00 08 11  00 f7 8f 0e  00 08 11 00  f7 00 00 00  0f 00 00 00  00 00 00 00
+```

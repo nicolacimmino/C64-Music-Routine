@@ -1,15 +1,20 @@
 
-[Instruments](#instruments)
-
-[Phrases](#phrases)
 
 # V-Sid #
 
+V-SID offers the music composer an abstract view of the SID hardware and a set of micro instructions that allow the creation of rich, evolving sounds. At the very core is a set of registers that closely map to those offered by the SID but are voice independent. This allows to write generic instrument code that can be run on any voice. On top of the virutualised registers is a set of registers manipulation and flow control instructions. We will refer to them as the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
+
+Instruments are defined by a sequence of IMC instructions that allow to create sounds that are more complex than it would be possible by just defyning a waveform and an ADSR envelope. Microcoded instruments can evolve all the sound parameters over time, giving access to a more rich sound palette. We will refer to the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
+
+Addittionally tracks can be composed sequencing phrases that can be combined and repeated. Each phrase is a sequence of notes played on a given instrument.
+
 ![vsid block diagram](images/vsid_block.png)
 
-# Instruments #
+The block diagram above shows the V-SID architecture. While not strictly necessary, a rough understanding of the architecture can help make the most out of the V-SID. Details about the internals are at the bottom of this read-me. 
 
-Instruments are defined by making use of a microcode that executes intructions on a virtualised SID. These instructions allow to create intruments that are more complex than it would be possible by just defyning a waveform and an ADSR envelope. Microcoded instruments can evolve all the sound parameters over time, giving access to a more rich sound palette. We will refer to the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
+## TICK ##
+
+The TICK is the time base of the V-SID, one tick elapses every time the music player routine is called. Usually this would happen once per frame so, on a PAL machines, every 20mS. This will affect the timings of IMC execution so you will need to estabilish how many times per frame the music routine will be called as a first step.
 
 ## The virtualised SID Registers ##
 

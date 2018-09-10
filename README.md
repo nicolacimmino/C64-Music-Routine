@@ -3,6 +3,10 @@
 
 [Phrases](#phrases)
 
+# V-Sid #
+
+![vsid block diagram](images/vsid_block.png)
+
 # Instruments #
 
 Instruments are defined by making use of a microcode that executes intructions on a virtualised SID. These instructions allow to create intruments that are more complex than it would be possible by just defyning a waveform and an ADSR envelope. Microcoded instruments can evolve all the sound parameters over time, giving access to a more rich sound palette. We will refer to the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.

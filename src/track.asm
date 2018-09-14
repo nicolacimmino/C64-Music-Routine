@@ -19,7 +19,6 @@
 ; *****************************************************************************
 
 incasm "instruments.asm"
-incasm "scale.asm"
 
         ; TICK, NOTE, INSTR, DUR
 

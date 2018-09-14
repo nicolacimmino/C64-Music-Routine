@@ -18,6 +18,34 @@
 ; *                                                                           *
 ; *****************************************************************************
 
+; *****************************************************************************
+; * PAGE ZERO MEMORY MAP                                                      *
+
+VOICE   =$04            ; 1 BYTE, CURRENT VOICE (1-3).
+VTOFF   =$05            ; 1 BYTE, CURRENT VOICE OFFSET IN VTBL (VOICE*8).
+
+        ; VOICE  TABLE  CONTAINS  4  SETS  OF  REGISTERS THAT KEEP TRACK OF THE 
+        ; CURRENT STATUS OF THE PHRASE AND  INSTRUMENT FOR EACH VOICE, EACH SET
+        ; IS 8 BYTES LONG. THE FIRST SET  REPRESENTS THE VOICE CURRENTLY PLAYNG
+        ; THE FOLLOWING 3 SETS ARE THE COPIES REPRESENTING  THE LAST STATUS FOR
+        ; FOR VOICES 1-3.
+
+VTBL    =$10            ; 32 BYTES, VOICE TABLE.
+PHRASP  =$10            ; 2 BYTES, POINTER INTO THE PHRASE.
+INSTRP  =$12            ; 2 BYTES, POINTER INTO THE INSTRUMENT MICROCODE.
+MUWAIT  =$14            ; 1 BYTE, TICKS LEFT FOR IMC WAIT COMMAND.
+TICK    =$15            ; 1 BYTE, CURRENT TICK.
+PHLOOP  =$16            ; 1 BYTE, PHRASE LOOP COUNTER.
+SROFF   =$17            ; 1 BYTE, SID VOICE REGISTERS OFFSET FROM SID BASE ADDR. 
+        ; VOICE TABLE ENDS AT $2F.
+
+MAXRST  =$31
+; *                                                                           *
+; *****************************************************************************
+
+align 256
+
+incasm "midi_scale.asm"
 incasm "imicrocode.asm"
 incasm "trackcmds.asm"
 

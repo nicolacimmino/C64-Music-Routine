@@ -86,10 +86,9 @@ CMDTBL  WORD CMD_WIN           ; 0X00   WAIT INIT
 
 ; *****************************************************************************
 ; * WAIT INIT                                                                 *
-; * INITIALISES THE WAIT COUNTER. TAKES THE NUMBER OF TICKS/2 in P0.          *
+; * INITIALISES THE WAIT COUNTER. TAKES THE NUMBER OF LOOPS in P0.            *
 
-CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
-        ASL
+CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0.
         STA  MUWAIT             ; 
         LDA  #$01               ; RETURN TOTAL CONSUMED 1 BYTE, Y BIT CLEAR.
         RTS
@@ -99,9 +98,9 @@ CMD_WIN AND  #%00001111         ; INIT THE WAIT COUNTER WITH P0*2.
 
 ; *****************************************************************************
 ; * LOOP WHILE WAITING.                                                       *
-; * LOOP P0 INSTRUCYIONS BACK UNLESS WAIT END. YIELDS AFTER EACH LOOP.        *
+; * LOOP P0 INSTRUCTIONS BACK UNLESS WAIT END. YIELDS AFTER EACH LOOP.        *
 
-CMD_LWW DEC  MUWAIT             ; ONE LESS TICK TO WAIT.
+CMD_LWW DEC  MUWAIT             ; ONE LESS LOOP TO WAIT.
         BNE  @LOOP              ; NOT ZERO YET?
         LDA  #$81               ; WE REACHED ZERO, 1 BYTE CONSUMED, Y BIT SET.
         RTS
@@ -151,8 +150,12 @@ DOWR    TAX
 ; * VOICE INIT.                                                               *
 ; *                                                                           *
 ; * BULK INITIALISE ALL 7 VOICE REGISTERS.                                    *
+; * P0:0 IF SET, VOICE GATE WILL BE OPEN AFTER SETTING UP ALL REGISTERS.      *
+; *                                                                           *
+; * THIS COMMAND ALWAYS YEALDS.                                               *
 
-CMD_VIN LDA  SROFF      ; FIRST VOICE OFFSET IN THE VOICE REGISTERS.
+CMD_VIN PHA             ; STORE P0 FOR LATER.
+        LDA  SROFF      ; FIRST VOICE OFFSET IN THE VOICE REGISTERS.
         CLC
         ADC  #6
         TAX
@@ -164,7 +167,16 @@ CMD_VIN LDA  SROFF      ; FIRST VOICE OFFSET IN THE VOICE REGISTERS.
         DEY
         BNE  @LOOP
 
-        LDA  #$08       ; WE CONSUMED 8 BYTES, Y BIT CLEAR.
+        PLA             ; RETRIEVE P0
+        BEQ  @DONE      ; DO NOTHING IF ZERO.
+
+        LDX  SROFF      ; GATE THE VOICE. SINCE THE VOICE CONTROL REGISTER
+        LDY  #5         ; IS WRITE ONLY WE CANNOT JUST SET THE BIT, WE NEED
+        LDA  (INSTRP),Y ; TO REWRITE THE ALL VALUE AS IT WAS IN P5 PLUS SET
+        ORA  #1         ; THE GATE BIT.
+        STA  $D404,X    ;
+
+@DONE   LDA  #$88       ; WE CONSUMED 8 BYTES, Y BIT SET.
         RTS
 
 ; *                                                                           *

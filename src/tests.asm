@@ -38,9 +38,6 @@
 START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         JSR  $FF81      ; RESET VIC, CLEAR SCREEN, THIS IS A KERNAL FUNCTION.
 
-        LDA  #%00110101 ; DISABLE KERNAL AND BASIC ROMS WE GO BARE METAL.
-        STA  $01        ; 
-
         LDA  #%01111111 ; DISABLE CIA-1/2 INTERRUPTS.
         STA  $DC0D      ;
         STA  $DD0D      ;
@@ -52,9 +49,9 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         STA  $D011
        
         LDA  #<ISR      ; SET THE INTERRUPT VECTOR TO THE ISR ROUTINE.
-        STA  $FFFE      ;
+        STA  $0314      ;
         LDA  #>ISR
-        STA  $FFFF
+        STA  $0315
 
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
         LDA  #%00000001 ; ENABLE RASTER INTERRUPT.
@@ -69,23 +66,30 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
 
         CLI             ; LET INTERRUPTS COME.
 
-        ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PLAYER RUNS ONLY ONCE PER
-        ; FRAME WHEN THE INTERRUPT HAPPENS.
+        ; PRINT THE "LINES:" LABEL AND THEN KEEP LOOPING PRINTING
+        ; ON SCREEN THE MAXIMUM NUMER RASTER LINES THE PLAYER TOOK.
         
-LOOP    LDA  MAXRST     ; PRINT MAXRST IN HEX ON THE SCREEN.
+        LDY #$FF
+        LDA #$93
+@LOOP   JSR $FFD2
+        INY
+        LDA T_LINES,Y
+        BNE @LOOP
+
+@LOOP1  LDA  MAXRST     ; PRINT MAXRST IN HEX ON THE SCREEN.
         CLC
         ROR
         ROR
         ROR
         ROR
         JSR  DEC2HEX        
-        STA  $400
+        STA  $406
         LDA  MAXRST
         JSR  DEC2HEX
-        STA  $401
-        JMP  LOOP
+        STA  $407
+        JMP  @LOOP1
 
-DEC2HEX AND  #$0F
+DEC2HEX AND  #$0F       ; SIMPLE HELPER TO PRINT A NIBBLE AS HEX.
         CMP  #$09
         BPL  PRINTL
         CLC
@@ -95,6 +99,8 @@ PRINTL  SEC
         SBC  #9
         RTS
 
+T_LINES TEXT "lines:"
+        BYTE 0
 ; *                                                                           *
 ; *****************************************************************************
 
@@ -117,10 +123,64 @@ ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
 
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
-        RTI
+        JMP $EA31       ; BACK TO KERNAL ISR
 
 ; *                                                                           *
 ; *****************************************************************************
 
+align 256
+
+        ; TICK, NOTE, INSTR, DUR
+
+TRACK   BYTE <PHRASE0, >PHRASE0
+        BYTE <PHRASEN, >PHRASEN
+        BYTE <PHRASEN, >PHRASEN
+        BYTE $00, $00
+
+align 4
+
+PHRASE0 BYTE $00, 00, $01, $00
+        BYTE $5F, $A0, <PHRASE0, >PHRASE0       
+
+PHRASEN BYTE $FF, $A0, <PHRASEN, >PHRASEN       
+
+      
+INSTTBL WORD INSTRNO    ; 0
+        WORD TEST1      ; 1
+        
+        ; Null instrument, used for voices where an instrument has not be set 
+        ; yet.
+INSTRNO BYTE $FF        ; END
+
+        ; INSTRUMENT:   TEST1
+        ; TESTS:        IMC WIN/LWW
+        ; EXPECTED:     TRIANGLE    3 TICKS
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK      
+        ;               END
+
+TEST1   BYTE $41, $80, $0E, $00, $00, $10, $00, $F7
+                        ; VIN                   FREQ=220Hz, 
+                        ;                       TRIANGLE 
+                        ;                       A=2mS D=6mS S=15  R=240ms 
+                   
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
+        
+        BYTE $24, $81   ; WRI 4, %00010001      NOISE, GATE ON        
+        BYTE $E0        ; YLD
+
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $24, $21   ; WRI 4, %00100001      SAWTOOTH, GATE ON        
+        BYTE $E0        ; YLD
+        BYTE $24, $81   ; WRI 4, %00010001      NOISE, GATE ON        
+        BYTE $15        ; LWW 5                 LOOP WHILE WAITING OFFSET -5
+
+        BYTE $24, $00   ; WRI 4, %00010001      NO WAVEFORM, GATE OFF
+        BYTE $FF        ; END
+
 incasm "muplayer.asm"
-incasm "track.asm"
+

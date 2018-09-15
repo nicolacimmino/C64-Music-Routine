@@ -63,37 +63,13 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         JSR  MUINIT
 
         LDA  $DC0D      ; ACKNOWLEDGE CIA INTERRUPTS.
-      
-        LDA  #0
-        STA  MAXRST
-
+              
         CLI             ; LET INTERRUPTS COME.
 
         ; THIS IS OUR MAIN LOOP. NOTHING  USEFUL THE PLAYER RUNS ONLY ONCE PER
         ; FRAME WHEN THE INTERRUPT HAPPENS.
         
-LOOP    LDA  MAXRST     ; PRINT MAXRST IN HEX ON THE SCREEN.
-        CLC
-        ROR
-        ROR
-        ROR
-        ROR
-        JSR  DEC2HEX        
-        STA  $400
-        LDA  MAXRST
-        JSR  DEC2HEX
-        STA  $401
-        JMP  LOOP
-
-DEC2HEX AND  #$0F
-        CMP  #$09
-        BPL  PRINTL
-        CLC
-        ADC  #$30
-        RTS
-PRINTL  SEC
-        SBC  #9
-        RTS
+        JMP  *
 
 ; *                                                                           *
 ; *****************************************************************************
@@ -102,19 +78,8 @@ PRINTL  SEC
 ; * THIS IS THE RASTER INTERRUPT  SERVICE ROUTINE. IN A FULL APP THIS WOULD DO* 
 ; * SEVERAL THINGS, WE HERE ONLY CALL THE MUSIC PLAYER.                       *
 
-ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
-        STA  $D020      ; PLAYER TAKES.
-
-        JSR  MUPLAY
-
-        LDA  #0         ; BORDER BACK TO BLACK.
-        STA  $D020
-
-        LDA  $D012
-        CMP  MAXRST
-        BMI  *+4
-        STA  MAXRST
-
+ISR     JSR  MUPLAY
+        
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
         RTI

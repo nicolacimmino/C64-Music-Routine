@@ -194,16 +194,17 @@ TEST1   BYTE $41, $80, $0E, $00, $00, $10, $00, $F7
 
         ; INSTRUMENT:   TEST2
         ; TESTS:        IMC WRI/VIN
-        ; EXPECTED:     TRIANGLE    3 TICKS
-        ;               NOISE       1 TICK
-        ;               SAWTOOTH    1 TICK
-        ;               NOISE       1 TICK
-        ;               SAWTOOTH    1 TICK
-        ;               NOISE       1 TICK      
+        ; EXPECTED:     NOISE RAISING 2mS
+        ;               NOISE FALLING TO 75% IN FEW mS *1) 
+        ;               NOISE SUSTAINED AT 75% FOR 2 TICKS
+        ;               NOISE FALLING TO 0% IN 24mS
         ;               END
+        ;
+        ; *1) THE ADSR IS SET FOR 24mS DECAY, THIS IS THE TIME TO REACH
+        ;     ZERO THOUGH, SINCE SUSTAIN IS AT 10 THE DROP WILL BE MUCH SHORTER.
 
 TEST2   BYTE $41, $8F, $FE, $00, $00, $80, $11, $A1
-                        ; VIN                   FREQ=220Hz, 
+                        ; VIN                   FREQ=3700Hz, 
                         ;                       NOISE, GATE ON,
                         ;                       A=2mS D=24mS S=10  R=24ms
                    

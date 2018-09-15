@@ -154,27 +154,11 @@ AFFECTS:
 
 ## Examples ##
 
-### Gunshot ### 
-
-The gunshot effect is obtained by gating quickly on and off some noise with an envelope decaying slowly. This gives the initial bang followed by a tail of fading noise. We set the voice frequency to 622Hz, noise in the SID is colored, so setting a frequency actually has an effect.
-
-```
-        BYTE $25, $02   ; WRI 5, $02            ATTACK 0MS, DECAY 16MS
-        BYTE $26, $A9   ; WRI 6, $A9            SUSTAIN 10, RELEASE 750MS
-        BYTE $21, $28   ; WRI 1, $28            FREQUENCY HI
-        BYTE $20, $C8   ; WRI 0, $C8            FREQUENCY LO (622HZ)
-        BYTE $24, $81   ; WRI 4, %10000001      WF NOISE, GATE ON        
-        BYTE $02        ; WIN 2                 INIT WAIT, 4 TICKS
-        BYTE $10        ; LWW                   LOOP (HERE) WHILE WAITING THE 4 TICKS
-        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF        
-        BYTE $FF        ; END
-```
-
 ### Drum ###
 
 The drum is obtained with a slowly (D=240ms) fading sequence of triangle,noise,triangle and pulse. Noise is at around 700Hz while the other waveforms are all played at around 220Hz.
 
-![drum](images/drum.png)
+![drum](samples/drum.png)
 
 ```
 DRUM1   BYTE $40, $8F, $0E, $00, $08, $10, $00, $F7

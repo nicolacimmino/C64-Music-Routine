@@ -1,34 +1,43 @@
 
 # Method #
 
-In order to verify that the code works as expected a series of tests have been run. The general method is to define a test intrument, with certain characteristics that exercise a particular feature of the player and use that instrument, in isolation, on a voice. The sound output has then been sampled and visually analyzed in Audacity to match the expected signal.
+In order to verify the code works as expected a series the tests defined in `test.asm` can be run. These are not fully automated tests. The general method is to define a test instrument, with certain characteristics that exercise a particular feature of the player and use that instrument, in isolation, on a voice. The sound output needs then to be sampled and visually analyzed, for instance in Octave,  to match the expected signal.
 
 ## TEST 1 ##
 
 ````ASM
-TEST1   BYTE $40, $8F, $0E, $00, $08, $11, $00, $F7
-                        ; VIN FREQ=220Hz, PW=50%,TRIANGLE, GATE ON,
-                        ; A=2mS D=6mS S=15  R=240ms        
-                        
-        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
+        ; INSTRUMENT:   TEST1
+        ; TESTS:        IMC WIN/LWW
+        ; EXPECTED:     TRIANGLE    3 TICKS
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK      
+        ;               END
+
+TEST1   BYTE $41, $80, $0E, $00, $00, $10, $00, $F7
+                        ; VIN                   FREQ=220Hz, 
+                        ;                       TRIANGLE, GATE ON 
+                        ;                       A=2mS D=6mS S=15  R=240ms 
+                   
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
+        
         BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
         BYTE $E0        ; YLD
 
-        BYTE $21, $0E   ; WVR 1, $0E            FREQ=220Hz
-        BYTE $24, $11   ; WRI 4, %00010001      TRIANGLE, GATE ON        
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $24, $21   ; WRI 4, %00100001      SAWTOOTH, GATE ON        
         BYTE $E0        ; YLD
+        BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
+        BYTE $15        ; LWW 5                 LOOP WHILE WAITING OFFSET -5
 
-        BYTE $24, $41   ; WRI 4, %01000001      PULSE, GATE ON        
-        BYTE $E0        ; YLD
-        
-        BYTE $21, $2E   ; WVR 1, $2E            FREQ=700Hz
-        BYTE $24, $80   ; WRI 4, %10000001      NOISE, GATE OFF
-                
+        BYTE $24, $00   ; WRI 4, %00010001      NO WAVEFORM, GATE OFF
         BYTE $FF        ; END
-
-        BYTE $24, $41   ; WRI 4, %01000001      PULSE, THIS SHOULD NEVER GET EXECUTED
-        BYTE $E0        ; YLD
 ````        
+![test1](tests/test1.png)
+
 
 ### VIN Test ###
 

@@ -39,7 +39,6 @@ PHLOOP  =$16            ; 1 BYTE, PHRASE LOOP COUNTER.
 SROFF   =$17            ; 1 BYTE, SID VOICE REGISTERS OFFSET FROM SID BASE ADDR. 
         ; VOICE TABLE ENDS AT $2F.
 
-MAXRST  =$31
 ; *                                                                           *
 ; *****************************************************************************
 

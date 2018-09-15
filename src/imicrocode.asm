@@ -55,7 +55,7 @@ IMCPLAY LDY  #0         ; LOAD CURRRENT INSTRUMENT COMMAND, WHICH IS POINTED BY
         TXA             ; RETRIEVE THE RETURN VALUE AND GET BIT 7 (YEALD FLAG)
         AND  #%10000000 ; WE SHOULD END HERE THE SEQUENCE EXECUTION IF SET.
         BEQ  IMCPLAY
-
+                
         RTS
 
 ; *                                                                           *

@@ -30,6 +30,14 @@
 ; *****************************************************************************
 
 ; *****************************************************************************
+; *                                                                           *
+
+MAXRST=$31
+
+; *                                                                           *
+; *****************************************************************************
+
+; *****************************************************************************
 ; * THIS IS THE ENTRY POINT INTO OUR PROGRAM. WE DO SOME SETUP AND THEN LET   *
 ; * THINGS ROLL FROM HERE.                                                    *
 
@@ -62,7 +70,7 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         LDA  $DC0D      ; ACKNOWLEDGE CIA INTERRUPTS.
       
         LDA  #0
-        STA  MAXRST
+        STA  MAXRST        
 
         CLI             ; LET INTERRUPTS COME.
 
@@ -86,7 +94,7 @@ START   SEI             ; PREVENT INTERRUPTS WHILE WE SET THINGS UP.
         STA  $406
         LDA  MAXRST
         JSR  DEC2HEX
-        STA  $407
+        STA  $407        
         JMP  @LOOP1
 
 DEC2HEX AND  #$0F       ; SIMPLE HELPER TO PRINT A NIBBLE AS HEX.
@@ -110,7 +118,7 @@ T_LINES TEXT "lines:"
 
 ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
         STA  $D020      ; PLAYER TAKES.
-
+        
         JSR  MUPLAY
 
         LDA  #0         ; BORDER BACK TO BLACK.
@@ -120,7 +128,7 @@ ISR     LDA  #1         ; SET BODER TO WHITE, SO WE SEE HOW MANY SCAN LINES THE
         CMP  MAXRST
         BMI  *+4
         STA  MAXRST
-
+               
         LSR  $D019      ; ACKNOWELEDGE VIDEO INTERRUPTS.
 
         JMP $EA31       ; BACK TO KERNAL ISR
@@ -140,6 +148,7 @@ TRACK   BYTE <PHRASE0, >PHRASE0
 align 4
 
 PHRASE0 BYTE $00, 00, $01, $00
+        BYTE $2F, 00, $02, $00
         BYTE $5F, $A0, <PHRASE0, >PHRASE0       
 
 PHRASEN BYTE $FF, $A0, <PHRASEN, >PHRASEN       
@@ -147,6 +156,7 @@ PHRASEN BYTE $FF, $A0, <PHRASEN, >PHRASEN
       
 INSTTBL WORD INSTRNO    ; 0
         WORD TEST1      ; 1
+        WORD TEST2      ; 2
         
         ; Null instrument, used for voices where an instrument has not be set 
         ; yet.
@@ -164,23 +174,46 @@ INSTRNO BYTE $FF        ; END
 
 TEST1   BYTE $41, $80, $0E, $00, $00, $10, $00, $F7
                         ; VIN                   FREQ=220Hz, 
-                        ;                       TRIANGLE 
+                        ;                       TRIANGLE, GATE ON 
                         ;                       A=2mS D=6mS S=15  R=240ms 
                    
         BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
         BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
         
-        BYTE $24, $81   ; WRI 4, %00010001      NOISE, GATE ON        
+        BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
         BYTE $E0        ; YLD
 
         BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
         BYTE $24, $21   ; WRI 4, %00100001      SAWTOOTH, GATE ON        
         BYTE $E0        ; YLD
-        BYTE $24, $81   ; WRI 4, %00010001      NOISE, GATE ON        
+        BYTE $24, $81   ; WRI 4, %10000001      NOISE, GATE ON        
         BYTE $15        ; LWW 5                 LOOP WHILE WAITING OFFSET -5
 
         BYTE $24, $00   ; WRI 4, %00010001      NO WAVEFORM, GATE OFF
         BYTE $FF        ; END
+
+        ; INSTRUMENT:   TEST2
+        ; TESTS:        IMC WRI/VIN
+        ; EXPECTED:     TRIANGLE    3 TICKS
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK
+        ;               SAWTOOTH    1 TICK
+        ;               NOISE       1 TICK      
+        ;               END
+
+TEST2   BYTE $41, $8F, $FE, $00, $00, $80, $11, $A1
+                        ; VIN                   FREQ=220Hz, 
+                        ;                       NOISE, GATE ON,
+                        ;                       A=2mS D=24mS S=10  R=24ms
+                   
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
+                
+        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF
+        BYTE $FF        ; END
+
+
 
 incasm "muplayer.asm"
 

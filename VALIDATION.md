@@ -36,43 +36,37 @@ TEST1   BYTE $41, $80, $0E, $00, $00, $10, $00, $F7
         BYTE $24, $00   ; WRI 4, %00010001      NO WAVEFORM, GATE OFF
         BYTE $FF        ; END
 ````        
+Expected waveform:
+
 ![test1](tests/test1.png)
 
 
-### VIN Test ###
-
-Verify that the VIN command correctly initialises a voice. The triangle wave is expected to have a frequency of 220Hz in the first part of the sequence, ie 4 periods in the 20mS duration.
-
-### VWR Test ###
-
-Verify that the VWR command correctly writes to the desired voice registester. The waveform is expected to change through the sequence triangle/noise/triangle/pulse.
-
-### YLD Test ###
-
-Verify that the the YLD command yields for 1 tick. Each step of the triangle/noise/triangle/pulse sequence is expected to last 20mS (one tick).
-
-### END Test ###
-
-Verify that the END command correctly terminates the execution of the IMC sequence. The change from noise to pulse at the end should not happen.
-
-Sampled output:
-
-![drum1](images/validation_drum_1.png)
-
 ## TEST 2 ##
 
-The following instrument is applied to all voices.
-
 ```ASM
-TEST1   BYTE $40, $8F, $0E, $00, $08, $11, $00, $F7
-        BYTE $FF
+        ; INSTRUMENT:   TEST2
+        ; TESTS:        IMC WRI/VIN
+        ; EXPECTED:     NOISE RAISING 2mS
+        ;               NOISE FALLING TO 75% IN FEW mS *1) 
+        ;               NOISE SUSTAINED AT 75% FOR 2 TICKS
+        ;               NOISE FALLING TO 0% IN 24mS
+        ;               END
+        ;
+        ; *1) THE ADSR IS SET FOR 24mS DECAY, THIS IS THE TIME TO REACH
+        ;     ZERO THOUGH, SINCE SUSTAIN IS AT 10 THE DROP WILL BE MUCH SHORTER.
+
+TEST2   BYTE $41, $8F, $FE, $00, $00, $80, $11, $A1
+                        ; VIN                   FREQ=3700Hz, 
+                        ;                       NOISE, GATE ON,
+                        ;                       A=2mS D=24mS S=10  R=24ms
+                   
+        BYTE $02        ; WIN 2                 INIT WAIT, 2 LOOPS                        
+        BYTE $10        ; LWW 0                 LOOP WHILE WAITING OFFSET 0
+                
+        BYTE $24, $80   ; WRI 4, %10000000      NOISE, GATE OFF
+        BYTE $FF        ; END
 ```
 
-### VOI Test ###
+Expected waveform:
 
-The VOI command works as expected on all voices.  A monitor is used to inspect the SID registers, all 3 voices are expected to be setup with the values as in the dump below.
-
-```
->M D400 D41F
-C:d400  8f 0e 00 08  11 00 f7 8f  0e 00 08 11  00 f7 8f 0e  00 08 11 00  f7 00 00 00  0f 00 00 00  00 00 00 00
-```
+![test2](tests/test2.png)

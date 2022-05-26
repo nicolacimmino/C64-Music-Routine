@@ -31,18 +31,5 @@ TRACK   BYTE <PHRASE1, >PHRASE1
 
 PHRASE0 BYTE $FF, $A0, <PHRASE0, >PHRASE0       
 
-PHRASE1 BYTE $00, 00, $06, $00
+PHRASE1 BYTE $00, 00, $02, $00
         BYTE $5F, $A0, <PHRASE1, >PHRASE1       
-
-PHRASE2 BYTE $00, 00, $06, $00        
-        BYTE $5F, $A0, <PHRASE2, >PHRASE2       
-
-PHRASE3 BYTE $00, 00, $06, $00
-        BYTE $5f, $A0, <PHRASE3, >PHRASE3
-
-        BYTE $01, $80, $00, $00
-PHRASE4 BYTE $00, 50, $01, $05
-        BYTE $0F, $A5, <PHRASE4, >PHRASE4       
-PHRASE5 BYTE $00, 90, $01, $05
-        BYTE $0F, $A0, <PHRASE5, >PHRASE5       
-        

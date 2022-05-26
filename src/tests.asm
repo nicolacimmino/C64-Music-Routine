@@ -141,15 +141,25 @@ align 256
         ; TICK, NOTE, INSTR, DUR
 
 TRACK   BYTE <PHRASE0, >PHRASE0
-        BYTE <PHRASEN, >PHRASEN
-        BYTE <PHRASEN, >PHRASEN
+        BYTE <PHRASE1, >PHRASE1
+        BYTE <PHRASE2, >PHRASE2
         BYTE $00, $00
 
 align 4
 
+              
 PHRASE0 BYTE $00, 00, $01, $00
-        BYTE $2F, 00, $02, $00
-        BYTE $5F, $A0, <PHRASE0, >PHRASE0       
+        BYTE $40, 00, $02, $00
+        BYTE $80, $A0, <PHRASEN, >PHRASEN       
+
+PHRASE1 BYTE $C0, 00, $01, $00
+        BYTE $00, 00, $02, $00
+        BYTE $40, $A0, <PHRASEN, >PHRASEN       
+
+PHRASE2 BYTE $FF, 00, $00, $00
+        BYTE $C0, 00, $01, $00
+        BYTE $00, 00, $02, $00
+        BYTE $40, $A0, <PHRASEN, >PHRASEN       
 
 PHRASEN BYTE $FF, $A0, <PHRASEN, >PHRASEN       
 

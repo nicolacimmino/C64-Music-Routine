@@ -1,6 +1,12 @@
 
 
-# V-Sid #
+# C64 Music Routine
+
+A long running hobby project of mine, much longer than the git history shows. I started with this back in 1987, and a big part of it has actually been written on paper (!) as my parents allowed me only one hour of screen time a day. At some point I moved from paper and C64 to cross compilation on my PC and, from time to time, still work on this.
+
+The idea is to abstract the SID (though I didn't call it that fancy at that time), and develop basic operaitons to define instruments to then be used to compose tunes.
+
+## V-Sid 
 
 V-SID offers the music composer an abstract view of the SID hardware and a set of micro instructions that allow the creation of rich, evolving sounds. At the very core is a set of registers that closely map to those offered by the SID but are voice independent. This allows to write generic instrument code that can be run on any voice. On top of the virutualised registers is a set of registers manipulation and flow control instructions. We will refer to them as the Instrument MicroCode as IMC throughout this text and, where needed, in the source code.
 
